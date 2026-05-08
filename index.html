@@ -1,0 +1,2976 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark" dir="ltr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RacePulse · Precision Timing & Event Management</title>
+    <meta name="description" content="RacePulse provides world-class race timing and event management services using advanced RFID technology and real-time results.">
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🏁</text></svg>"/>
+
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=DM+Sans:wght@300;400;500;600&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+
+    <!-- CDN Stack -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://unpkg.com/aos@2.3.4/dist/aos.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
+
+    <style>
+        /* ── THEME SYSTEM ── */
+        :root {
+            --bg-primary: #080C1A;
+            --bg-secondary: #0F1628;
+            --bg-card: #131B2E;
+            --accent-teal: #00E5C4;
+            --accent-coral: #FF3D5A;
+            --accent-gold: #F5C842;
+            --text-primary: #F0F4FF;
+            --text-secondary: #A8B8D0;
+            --text-muted: #5A6A82;
+            --border: rgba(0, 229, 196, 0.12);
+            --glow-teal: 0 0 30px rgba(0, 229, 196, 0.20);
+            
+            --font-display: 'Orbitron', sans-serif;
+            --font-body: 'DM Sans', sans-serif;
+            --font-mono: 'Space Mono', monospace;
+
+            --nav-height: 70px;
+        }
+
+        [data-theme="light"] {
+            --bg-primary: #FAFBFF;
+            --bg-secondary: #F0F3FA;
+            --bg-card: #FFFFFF;
+            --text-primary: #080C1A;
+            --text-secondary: #3A4A60;
+            --text-muted: #7A8A9A;
+            --border: rgba(8, 12, 26, 0.10);
+            --glow-teal: 0 0 20px rgba(0, 229, 196, 0.10);
+        }
+
+        /* ── GLOBAL RESET ── */
+        *, *::before, *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        html {
+            overflow-x: hidden;
+            scroll-behavior: smooth;
+        }
+        body {
+            overflow-x: hidden;
+            max-width: 100vw;
+            font-family: var(--font-body);
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.7;
+            transition: background 0.3s ease, color 0.3s ease;
+        }
+        img {
+            display: block;
+            max-width: 100%;
+            height: auto;
+        }
+
+        /* ── TYPOGRAPHY ── */
+        h1, h2, h3, h4, h5, h6 {
+            font-family: var(--font-display);
+            text-align: center;
+        }
+        h1.hero-title {
+            font-size: clamp(3rem, 7vw, 6rem);
+            font-weight: 900;
+            line-height: 1.1;
+        }
+        h1.page-title {
+            font-size: clamp(2.2rem, 5vw, 4rem);
+            font-weight: 700;
+        }
+        h2.section-title {
+            font-size: clamp(1.8rem, 4vw, 3rem);
+            font-weight: 700;
+        }
+        h3.card-title {
+            font-size: clamp(1rem, 2vw, 1.4rem);
+            font-weight: 600;
+        }
+        .eyebrow {
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 4px;
+            color: var(--accent-teal);
+            font-weight: 500;
+            display: block;
+            margin-bottom: 1rem;
+        }
+        .subtitle {
+            font-family: var(--font-body);
+            color: var(--text-secondary);
+            max-width: 580px;
+            margin: 0 auto;
+            font-size: 1.1rem;
+        }
+        .timing-font {
+            font-family: var(--font-mono);
+            font-weight: 700;
+        }
+
+        /* ── LIGHT/DARK HELPERS ── */
+        .text-light-always { color: #F0F4FF !important; }
+        .text-secondary-always { color: #A8B8D0 !important; }
+        .bg-dark-always { background: #050810 !important; }
+
+        /* ── LAYOUT ── */
+        .container-rp {
+            width: 100%;
+            max-width: 1240px;
+            margin: 0 auto;
+            padding: 0 clamp(1rem, 4vw, 3rem);
+        }
+        section {
+            width: 100%;
+            overflow: hidden;
+            padding: clamp(50px, 8vw, 100px) 0;
+            text-align: center;
+        }
+        .section-header {
+            margin-bottom: 3.5rem;
+        }
+        .divider {
+            width: 50px;
+            height: 2px;
+            background: var(--accent-teal);
+            margin: 1rem auto;
+        }
+
+        /* ── NAVBAR ── */
+        nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: var(--nav-height);
+            z-index: 9999;
+            background: rgba(8, 12, 26, 0.95);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            transition: all 0.3s ease;
+        }
+        nav.scrolled {
+            background: rgba(8, 12, 26, 0.98);
+            box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+        }
+        [data-theme="light"] nav {
+            background: rgba(250, 251, 255, 0.95);
+        }
+
+        .nav-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            width: 100%;
+        }
+        .logo {
+            font-family: var(--font-display);
+            font-size: 1.4rem;
+            color: var(--accent-teal);
+            text-decoration: none;
+            font-weight: 700;
+            letter-spacing: -1px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+            list-style: none;
+            margin: 0;
+            padding: 0;
+        }
+        .nav-links a {
+            font-family: var(--font-body);
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--text-primary);
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.3s ease;
+            cursor: pointer;
+            position: relative;
+            padding-bottom: 5px;
+        }
+        .nav-links a:hover, .nav-links a.active {
+            color: var(--accent-teal);
+        }
+        .nav-links a.active::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background: var(--accent-teal);
+        }
+        .nav-controls {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+        }
+        .control-btn {
+            background: transparent;
+            border: none;
+            color: var(--text-primary);
+            cursor: pointer;
+            font-size: 1.1rem;
+            transition: color 0.3s ease;
+        }
+        .control-btn:hover {
+            color: var(--accent-teal);
+        }
+
+        /* ── HAMBURGER ── */
+        .hamburger {
+            display: none;
+            flex-direction: column;
+            gap: 6px;
+            background: transparent;
+            border: none;
+            cursor: pointer;
+            padding: 10px;
+            z-index: 10001;
+        }
+        .hamburger span {
+            display: block;
+            width: 28px;
+            height: 2px;
+            background: var(--accent-teal);
+            transition: all 0.3s ease;
+        }
+        .hamburger.open span:nth-child(1) { transform: translateY(8px) rotate(45deg); }
+        .hamburger.open span:nth-child(2) { opacity: 0; }
+        .hamburger.open span:nth-child(3) { transform: translateY(-8px) rotate(-45deg); }
+
+        /* ── MOBILE MENU ── */
+        .mobile-menu-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(8, 12, 26, 0.99);
+            backdrop-filter: blur(30px);
+            z-index: 10000;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.4s ease;
+        }
+        .mobile-menu-overlay.open {
+            opacity: 1;
+            visibility: visible;
+        }
+        .mobile-links {
+            display: flex;
+            flex-direction: column;
+            gap: 2rem;
+            text-align: center;
+        }
+        .mobile-links a {
+            font-family: var(--font-display);
+            font-size: 1.4rem;
+            color: var(--text-primary);
+            text-decoration: none;
+            padding: 1rem;
+        }
+        .mobile-controls {
+            margin-top: 3rem;
+            display: flex;
+            gap: 2rem;
+        }
+
+        /* ── HERO SECTION ── */
+        .hero {
+            min-height: 100svh;
+            padding-top: var(--nav-height);
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .hero-bg {
+            position: absolute;
+            inset: 0;
+            z-index: 1;
+        }
+        .hero-bg img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            background-attachment: fixed;
+        }
+        .hero-overlay {
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(to bottom, rgba(8,12,26,0.65), rgba(8,12,26,0.90));
+            z-index: 2;
+        }
+        .hero-content {
+            position: relative;
+            z-index: 3;
+            max-width: 900px;
+            padding: 0 2rem;
+            color: #F0F4FF; /* Always light in hero */
+        }
+        .hero-content h1, .hero-content h2, .hero-content .page-title, .hero-content .hero-title {
+            color: #F0F4FF;
+        }
+        .hero-content .subtitle {
+            color: #A8B8D0;
+        }
+        .hero-eyebrow-wrap {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+        .hero-line {
+            width: 0;
+            height: 2px;
+            background: var(--accent-teal);
+            margin-top: 0.5rem;
+            transition: width 1s ease 0.5s;
+        }
+        .hero.aos-animate .hero-line {
+            width: 60px;
+        }
+        .hero .subtitle {
+            margin: 1.5rem auto 2.5rem;
+            color: var(--text-secondary);
+        }
+        .btn-group-center {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        /* ── BUTTONS ── */
+        .btn-rp {
+            display: inline-block;
+            font-family: var(--font-display);
+            font-size: 0.75rem;
+            padding: 14px 32px;
+            border-radius: 6px;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            text-decoration: none;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: none;
+            min-height: 48px;
+            min-width: 140px;
+            width: fit-content;
+        }
+        .btn-primary {
+            background: var(--accent-teal);
+            color: #080C1A;
+        }
+        .btn-primary:hover {
+            filter: brightness(1.1);
+            transform: translateY(-2px);
+            background: var(--accent-teal);
+            color: #080C1A;
+        }
+        .btn-outline {
+            background: transparent;
+            border: 1.5px solid var(--accent-coral);
+            color: var(--accent-coral);
+        }
+        .btn-outline:hover {
+            background: var(--accent-coral);
+            color: #080C1A;
+            transform: translateY(-2px);
+        }
+        .btn-card {
+            margin: 1.5rem auto 0;
+        }
+
+        /* ── GLASS CARD ── */
+        .glass-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 2.5rem 2rem;
+            text-align: center;
+            transition: transform 0.35s ease, border-color 0.35s ease, box-shadow 0.35s ease;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            height: 100%;
+        }
+        .glass-card:hover {
+            transform: translateY(-6px);
+            border-color: var(--accent-teal);
+            box-shadow: var(--glow-teal);
+        }
+        .card-icon {
+            width: 72px;
+            height: 72px;
+            border-radius: 18px;
+            background: rgba(0, 229, 196, 0.1);
+            border: 1px solid rgba(0, 229, 196, 0.25);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.75rem;
+            margin: 0 auto 1.5rem;
+            color: var(--accent-teal);
+        }
+        .glass-card p {
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+            line-height: 1.7;
+            flex: 1;
+        }
+
+        /* ── IMAGE GRID ── */
+        .img-grid {
+            display: grid;
+            gap: 1.5rem;
+            grid-template-columns: repeat(4, 1fr);
+        }
+        .img-card {
+            position: relative;
+            overflow: hidden;
+            border-radius: 12px;
+            aspect-ratio: 4/3;
+            background: var(--bg-secondary);
+        }
+        .img-card img {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.6s ease;
+        }
+        .img-card:hover img {
+            transform: scale(1.08);
+        }
+        .img-card-overlay {
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(to top, rgba(8,12,26,0.9) 0%, transparent 70%);
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+            padding: 1.25rem;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            z-index: 2;
+        }
+        .img-card:hover .img-card-overlay {
+            opacity: 1;
+        }
+        .img-card-overlay h3 {
+            color: white;
+            margin: 0;
+            font-size: 1.1rem;
+            text-align: left;
+        }
+
+        /* ── STATS BAR ── */
+        .stats-bar {
+            background: var(--bg-secondary);
+            padding: 40px 0;
+            border-top: 1px solid var(--border);
+            border-bottom: 1px solid var(--border);
+        }
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 2rem;
+        }
+        .stat-item h3 {
+            color: var(--accent-teal);
+            font-family: var(--font-mono);
+            font-size: 2.5rem;
+            margin-bottom: 0.25rem;
+        }
+        .stat-item p {
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            margin: 0;
+        }
+
+        /* ── PARALLAX BANNER ── */
+        .parallax-banner {
+            position: relative;
+            height: 400px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+        .parallax-bg {
+            position: absolute;
+            inset: 0;
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            z-index: 1;
+        }
+        .parallax-overlay {
+            position: absolute;
+            inset: 0;
+            background: rgba(8, 12, 26, 0.8);
+            z-index: 2;
+        }
+        .parallax-content {
+            position: relative;
+            z-index: 3;
+            max-width: 800px;
+            color: #F0F4FF;
+        }
+
+        /* ── EVENT CARDS ── */
+        .event-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 2rem;
+        }
+        .event-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+        .event-card:hover {
+            transform: translateY(-8px);
+            border-color: var(--accent-teal);
+        }
+        .event-img {
+            width: 100%;
+            aspect-ratio: 16/9;
+            overflow: hidden;
+            position: relative;
+        }
+        .event-img img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        .event-date {
+            position: absolute;
+            top: 1rem;
+            left: 1rem;
+            background: var(--accent-teal);
+            color: #080C1A;
+            padding: 4px 12px;
+            font-family: var(--font-display);
+            font-size: 0.7rem;
+            font-weight: 700;
+            border-radius: 4px;
+        }
+        .event-body {
+            padding: 1.5rem;
+        }
+        .event-meta {
+            color: var(--text-muted);
+            font-size: 0.85rem;
+            margin-bottom: 1rem;
+        }
+
+        /* ── RESULTS TABLE ── */
+        .results-panel {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 2rem;
+            margin-bottom: 3rem;
+        }
+        .table-responsive {
+            margin-top: 1.5rem;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-family: var(--font-body);
+        }
+        th {
+            background: rgba(0, 229, 196, 0.1);
+            color: var(--accent-teal);
+            font-family: var(--font-display);
+            font-size: 0.8rem;
+            padding: 1rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            text-align: center;
+        }
+        td {
+            padding: 1rem;
+            border-bottom: 1px solid var(--border);
+            color: var(--text-secondary);
+            text-align: center;
+        }
+        tr:nth-child(even) {
+            background: rgba(0, 229, 196, 0.03);
+        }
+        tr:hover {
+            background: rgba(0, 229, 196, 0.07);
+        }
+        .rank-badge {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto;
+            font-weight: 700;
+            color: #080C1A;
+        }
+        .rank-1 { background: var(--accent-gold); }
+        .rank-2 { background: #C0C0C0; }
+        .rank-3 { background: #CD7F32; }
+        .time-col {
+            font-family: var(--font-mono);
+            color: var(--accent-teal);
+            font-weight: 700;
+        }
+        .pace-track {
+            width: 100px;
+            height: 4px;
+            background: var(--border);
+            border-radius: 2px;
+            margin: 0 auto;
+            overflow: hidden;
+        }
+        .pace-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--accent-teal), var(--accent-coral));
+        }
+
+        /* ── PODIUM ── */
+        .podium-wrap {
+            display: flex;
+            align-items: flex-end;
+            justify-content: center;
+            gap: 1rem;
+            margin-top: 3rem;
+        }
+        .podium-block {
+            width: 150px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .podium-bar {
+            width: 100%;
+            border-radius: 12px 12px 0 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: #080C1A;
+            font-family: var(--font-display);
+            padding: 2rem 0;
+        }
+        .podium-1 { height: 200px; background: var(--accent-gold); order: 2; }
+        .podium-2 { height: 160px; background: #C0C0C0; order: 1; }
+        .podium-3 { height: 120px; background: #CD7F32; order: 3; }
+        .podium-info {
+            margin-bottom: 1rem;
+            text-align: center;
+        }
+        .podium-name { font-weight: 700; color: var(--text-primary); margin-top: 0.5rem; }
+
+        /* ── SPONSORS ── */
+        .sponsor-tier {
+            margin-bottom: 4rem;
+        }
+        .sponsor-grid {
+            display: grid;
+            gap: 2rem;
+            justify-content: center;
+        }
+        .tier-platinum { grid-template-columns: repeat(2, 300px); }
+        .tier-gold { grid-template-columns: repeat(3, 240px); }
+        .tier-silver { grid-template-columns: repeat(4, 200px); }
+        .tier-bronze { grid-template-columns: repeat(5, 180px); }
+        .sponsor-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 2rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            transition: all 0.3s ease;
+        }
+        .sponsor-card:hover { border-color: var(--accent-teal); transform: scale(1.05); }
+        .sponsor-logo {
+            height: 80px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 1rem;
+        }
+        .sponsor-logo img {
+            max-height: 100%;
+            filter: brightness(0) invert(1);
+        }
+        [data-theme="light"] .sponsor-logo img { filter: none; }
+        .tier-badge {
+            font-size: 0.6rem;
+            padding: 2px 8px;
+            border-radius: 10px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 0.5rem;
+        }
+
+        /* ── CONTACT ── */
+        .contact-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 3rem;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        .form-rp {
+            text-align: left;
+        }
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+        }
+        .form-control-rp {
+            width: 100%;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 12px 16px;
+            color: var(--text-primary);
+            font-family: var(--font-body);
+            transition: border-color 0.3s ease;
+        }
+        .form-control-rp:focus {
+            outline: none;
+            border-color: var(--accent-teal);
+        }
+        .error-msg {
+            color: var(--accent-coral);
+            font-size: 0.8rem;
+            margin-top: 0.25rem;
+            display: none;
+        }
+
+        /* ── FOOTER ── */
+        footer {
+            background: #050810;
+            padding: 80px 0 40px;
+            border-top: 2px solid;
+            border-image: linear-gradient(90deg, transparent, var(--accent-teal), transparent) 1;
+            color: #A8B8D0; /* Always light in footer */
+            text-align: left;
+        }
+        .footer-grid {
+            display: grid;
+            grid-template-columns: 1.5fr 1fr 1fr 1fr;
+            gap: 3rem;
+        }
+        .footer-col h4 {
+            color: #F0F4FF; /* Always light in footer */
+            text-align: left;
+            margin-bottom: 1.5rem;
+            font-size: 1.1rem;
+        }
+        .footer-links {
+            list-style: none;
+            padding: 0;
+        }
+        .footer-links li {
+            margin-bottom: 0.75rem;
+        }
+        .footer-links a {
+            color: var(--text-muted);
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+        .footer-links a:hover { color: var(--accent-teal); }
+        .social-row {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1.5rem;
+        }
+        .social-icon {
+            width: 40px;
+            height: 40px;
+            border: 1px solid var(--accent-teal);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--accent-teal);
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+        .social-icon:hover {
+            background: var(--accent-teal);
+            color: #080C1A;
+        }
+        .footer-bottom {
+            margin-top: 50px;
+            padding-top: 24px;
+            border-top: 1px solid rgba(255,255,255,0.05);
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.8rem;
+            color: var(--text-muted);
+        }
+
+        /* ── BACK TO TOP ── */
+        #backTop {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            z-index: 8000;
+            width: 52px;
+            height: 52px;
+            border-radius: 12px;
+            background: var(--accent-teal);
+            color: #080C1A;
+            border: none;
+            cursor: pointer;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.1rem;
+            box-shadow: 0 4px 20px rgba(0, 229, 196, 0.35);
+            transition: all 0.3s ease;
+        }
+        #backTop.show { display: flex; }
+        #backTop:hover { transform: translateY(-4px); box-shadow: 0 8px 30px rgba(0, 229, 196, 0.5); }
+
+        /* ── RESPONSIVE ── */
+        @media (max-width: 1023px) {
+            .nav-links, .nav-controls .btn-rp, .nav-controls .control-btn:not(.theme-toggle) {
+                display: none;
+            }
+            .hamburger { display: flex; }
+            .img-grid { grid-template-columns: repeat(2, 1fr); }
+            .footer-grid { grid-template-columns: repeat(2, 1fr); }
+            .stats-grid { grid-template-columns: repeat(2, 1fr); }
+            .event-grid { grid-template-columns: repeat(1, 1fr); }
+            .hero-bg img { background-attachment: scroll; }
+            .hero-title { font-size: clamp(2.5rem, 8vw, 4rem); }
+        }
+
+        @media (max-width: 639px) {
+            .img-grid { grid-template-columns: 1fr; }
+            .footer-grid { grid-template-columns: 1fr; }
+            .stats-grid { grid-template-columns: 1fr; }
+            .sponsor-grid { grid-template-columns: 1fr !important; }
+            .podium-wrap { flex-direction: column; align-items: center; }
+            .podium-block { order: unset !important; }
+            .footer-bottom { flex-direction: column; gap: 1rem; text-align: center; }
+            section { padding: 50px 0; }
+        }
+
+        /* ── ANIMATIONS ── */
+        #particles-js {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            z-index: 2;
+            top: 0;
+            left: 0;
+        }
+        .page { display: none; }
+        .page.active { display: block; }
+
+        @media (prefers-reduced-motion: reduce) {
+            * {
+                animation: none !important;
+                transition: none !important;
+            }
+        }
+    </style>
+</head>
+<body class="transition-all">
+
+    <!-- ── NAVBAR ── -->
+    <nav id="mainNav">
+        <div class="container-rp nav-content">
+            <a href="#" class="logo" onclick="showPage('home')"><i class="fas fa-flag-checkered"></i> RACEPULSE</a>
+            
+            <ul class="nav-links">
+                <li><a onclick="showPage('home')" class="nav-link-item active" data-page="home">Home</a></li>
+                <li><a onclick="showPage('home2')" class="nav-link-item" data-page="home2">Home 2</a></li>
+                <li><a onclick="showPage('about')" class="nav-link-item" data-page="about">About</a></li>
+                <li><a onclick="showPage('services')" class="nav-link-item" data-page="services">Services</a></li>
+                <li><a onclick="showPage('events')" class="nav-link-item" data-page="events">Events</a></li>
+                <li><a onclick="showPage('results')" class="nav-link-item" data-page="results">Results</a></li>
+                <li><a onclick="showPage('sponsors')" class="nav-link-item" data-page="sponsors">Sponsors</a></li>
+                <li><a onclick="showPage('contact')" class="nav-link-item" data-page="contact">Contact</a></li>
+            </ul>
+
+            <div class="nav-controls">
+                <button class="control-btn" onclick="toggleTheme()" title="Toggle Theme">
+                    <i class="fas fa-moon" id="theme-icon"></i>
+                </button>
+                <button class="control-btn" onclick="toggleRTL()" title="Toggle RTL">
+                    <i class="fas fa-language"></i>
+                </button>
+                <a onclick="showPage('contact')" class="btn-rp btn-primary">Book Now</a>
+                <button class="hamburger" id="nav-toggle" onclick="toggleMobileMenu()">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- ── MOBILE MENU ── -->
+    <div class="mobile-menu-overlay" id="mobileMenu">
+        <div class="mobile-links">
+            <a onclick="showPage('home'); toggleMobileMenu()">HOME</a>
+            <a onclick="showPage('home2'); toggleMobileMenu()">HOME 2</a>
+            <a onclick="showPage('about'); toggleMobileMenu()">ABOUT</a>
+            <a onclick="showPage('services'); toggleMobileMenu()">SERVICES</a>
+            <a onclick="showPage('events'); toggleMobileMenu()">EVENTS</a>
+            <a onclick="showPage('results'); toggleMobileMenu()">RESULTS</a>
+            <a onclick="showPage('sponsors'); toggleMobileMenu()">SPONSORS</a>
+            <a onclick="showPage('contact'); toggleMobileMenu()">CONTACT</a>
+        </div>
+        <div class="mobile-controls">
+            <button class="control-btn" onclick="toggleTheme()">
+                <i class="fas fa-moon"></i>
+            </button>
+            <button class="control-btn" onclick="toggleRTL()">
+                <i class="fas fa-language"></i>
+            </button>
+        </div>
+    </div>
+
+    <!-- ── PAGES CONTAINER ── -->
+    <main id="pages">
+        
+        <!-- ── PAGE: HOME ── -->
+        <div id="page-home" class="page active">
+            <!-- S1 HERO -->
+            <section class="hero" data-aos="fade">
+                <div id="particles-js"></div>
+                <div class="hero-bg">
+                    <img src="https://images.unsplash.com/photo-1571008887538-b36bb32f4571?w=1600&q=90" alt="Marathon start line">
+                </div>
+                <div class="hero-overlay"></div>
+                <div class="hero-content" data-aos="zoom-out" data-aos-duration="1200">
+                    <div class="hero-eyebrow-wrap">
+                        <span class="eyebrow">The Gold Standard in Timing</span>
+                        <div class="hero-line"></div>
+                    </div>
+                    <h1 class="hero-title">Precision Timing.<br>Legendary Races.</h1>
+                    <p class="subtitle">From 5K fun runs to full marathons — powered by RacePulse technology. Reliable. Accurate. Real-time.</p>
+                    <div class="btn-group-center">
+                        <a onclick="showPage('events')" class="btn-rp btn-primary">Get Started</a>
+                        <a onclick="showPage('results')" class="btn-rp btn-outline">View Live Results</a>
+                    </div>
+                </div>
+            </section>
+
+            <!-- S2 STATS BAR -->
+            <div class="stats-bar">
+                <div class="container-rp">
+                    <div class="stats-grid">
+                        <div class="stat-item" data-aos="fade-up">
+                            <h3 class="counter" data-target="2400">0</h3>
+                            <p>Runners Timed</p>
+                        </div>
+                        <div class="stat-item" data-aos="fade-up" data-aos-delay="100">
+                            <h3 class="counter" data-target="156">0</h3>
+                            <p>Global Events</p>
+                        </div>
+                        <div class="stat-item" data-aos="fade-up" data-aos-delay="200">
+                            <h3>99.9%</h3>
+                            <p>Accuracy Rate</p>
+                        </div>
+                        <div class="stat-item" data-aos="fade-up" data-aos-delay="300">
+                            <h3>24/7</h3>
+                            <p>Support</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- S3 FEATURES -->
+            <section>
+                <div class="container-rp">
+                    <div class="section-header" data-aos="fade-up">
+                        <span class="eyebrow">Capabilities</span>
+                        <h2 class="section-title">Everything You Need</h2>
+                        <div class="divider"></div>
+                    </div>
+                    <div class="img-grid">
+                        <div class="img-card" data-aos="fade-up">
+                            <img src="https://images.unsplash.com/photo-1571008887538-b36bb32f4571?w=600&q=85" alt="5K Timing">
+                            <div class="img-card-overlay"><h3>5K Timing</h3></div>
+                        </div>
+                        <div class="img-card" data-aos="fade-up" data-aos-delay="50">
+                            <img src="https://images.unsplash.com/photo-1502904550040-7534597429ae?w=600&q=85" alt="Live Results">
+                            <div class="img-card-overlay"><h3>Live Results</h3></div>
+                        </div>
+                        <div class="img-card" data-aos="fade-up" data-aos-delay="100">
+                            <img src="https://images.unsplash.com/photo-1560272564-c83b66b1ad12?w=600&q=85" alt="Bib Tracking">
+                            <div class="img-card-overlay"><h3>Bib Tracking</h3></div>
+                        </div>
+                        <div class="img-card" data-aos="fade-up" data-aos-delay="150">
+                            <img src="https://images.unsplash.com/photo-1551698618-1dfe5d97d256?w=600&q=85" alt="Volunteers">
+                            <div class="img-card-overlay"><h3>Volunteers</h3></div>
+                        </div>
+                        <div class="img-card" data-aos="fade-up">
+                            <img src="https://images.unsplash.com/photo-1542766788-a2f588f447ee?w=600&q=85" alt="Sponsors">
+                            <div class="img-card-overlay"><h3>Sponsors</h3></div>
+                        </div>
+                        <div class="img-card" data-aos="fade-up" data-aos-delay="50">
+                            <img src="https://images.unsplash.com/photo-1461897104016-0b3b00cc81ee?w=600&q=85" alt="Finish Line">
+                            <div class="img-card-overlay"><h3>Finish Line</h3></div>
+                        </div>
+                        <div class="img-card" data-aos="fade-up" data-aos-delay="100">
+                            <img src="https://images.unsplash.com/photo-1493770348161-369560ae357d?w=600&q=85" alt="Awards">
+                            <div class="img-card-overlay"><h3>Awards</h3></div>
+                        </div>
+                        <div class="img-card" data-aos="fade-up" data-aos-delay="150">
+                            <img src="https://images.unsplash.com/photo-1476480862126-209bfaa8edc8?w=600&q=85" alt="Route Map">
+                            <div class="img-card-overlay"><h3>Route Map</h3></div>
+                        </div>
+                        <div class="img-card" data-aos="fade-up">
+                            <img src="https://images.unsplash.com/photo-1526676037777-05a232554f77?w=600&q=85" alt="Night Race">
+                            <div class="img-card-overlay"><h3>Night Race</h3></div>
+                        </div>
+                        <div class="img-card" data-aos="fade-up" data-aos-delay="50">
+                            <img src="https://images.unsplash.com/photo-1531415074968-036ba1b575da?w=600&q=85" alt="Marathon">
+                            <div class="img-card-overlay"><h3>Marathon</h3></div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- S4 SERVICES -->
+            <section style="background: var(--bg-secondary);">
+                <div class="container-rp">
+                    <div class="section-header" data-aos="fade-up">
+                        <span class="eyebrow">Solutions</span>
+                        <h2 class="section-title">Core Services</h2>
+                        <div class="divider"></div>
+                    </div>
+                    <div class="row g-4">
+                        <div class="col-lg-4 col-md-6" data-aos="fade-up">
+                            <div class="glass-card">
+                                <div class="card-icon"><i class="fas fa-microchip"></i></div>
+                                <h3 class="card-title">Chip Timing</h3>
+                                <p>Ultra-reliable dual-frequency RFID systems designed for mass participation events.</p>
+                                <a onclick="showPage('services')" class="btn-rp btn-outline btn-card">Learn More</a>
+                            </div>
+                        </div>
+                        <div class="col-lg-4 col-md-6" data-aos="fade-up" data-aos-delay="100">
+                            <div class="glass-card">
+                                <div class="card-icon"><i class="fas fa-globe"></i></div>
+                                <h3 class="card-title">Live Portal</h3>
+                                <p>Instantly accessible results, leaderboards, and personalized runner tracking for spectators.</p>
+                                <a onclick="showPage('services')" class="btn-rp btn-outline btn-card">Learn More</a>
+                            </div>
+                        </div>
+                        <div class="col-lg-4 col-md-6 mx-md-auto" data-aos="fade-up" data-aos-delay="200">
+                            <div class="glass-card">
+                                <div class="card-icon"><i class="fas fa-id-card"></i></div>
+                                <h3 class="card-title">Bib Management</h3>
+                                <p>End-to-end management of bib production, distribution, and registration syncing.</p>
+                                <a onclick="showPage('services')" class="btn-rp btn-outline btn-card">Learn More</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- S5 FULL-WIDTH BANNER -->
+            <div class="parallax-banner" data-aos="fade">
+                <div class="parallax-bg" style="background-image: url('https://images.unsplash.com/photo-1502904550040-7534597429ae?w=1600');"></div>
+                <div class="parallax-overlay"></div>
+                <div class="parallax-content container-rp" data-aos="zoom-in">
+                    <h2 class="section-title">"Accuracy isn't an option, it's our obsession."</h2>
+                    <p class="subtitle" style="margin-top: 1rem;">Join over 1,000 race directors who trust RacePulse for their biggest days.</p>
+                    <a onclick="showPage('contact')" class="btn-rp btn-primary" style="margin-top: 2rem;">Work with Us</a>
+                </div>
+            </div>
+
+            <!-- S6 UPCOMING EVENTS -->
+            <section>
+                <div class="container-rp">
+                    <div class="section-header" data-aos="fade-up">
+                        <span class="eyebrow">Calendar</span>
+                        <h2 class="section-title">Upcoming Races</h2>
+                        <div class="divider"></div>
+                    </div>
+                    <div class="event-grid">
+                        <div class="event-card" data-aos="fade-up">
+                            <div class="event-img">
+                                <img src="https://images.unsplash.com/photo-1571008887538-b36bb32f4571?w=600&q=85" alt="Event">
+                                <span class="event-date">SEP 12, 2026</span>
+                            </div>
+                            <div class="event-body">
+                                <h3 class="card-title">Coastal Marathon</h3>
+                                <p class="event-meta">Chennai, India | 42.2K & 21.1K</p>
+                                <a href="#" class="btn-rp btn-primary">Register Now</a>
+                            </div>
+                        </div>
+                        <div class="event-card" data-aos="fade-up" data-aos-delay="100">
+                            <div class="event-img">
+                                <img src="https://images.unsplash.com/photo-1551698618-1dfe5d97d256?w=600&q=85" alt="Event">
+                                <span class="event-date">OCT 05, 2026</span>
+                            </div>
+                            <div class="event-body">
+                                <h3 class="card-title">City Lights 10K</h3>
+                                <p class="event-meta">Mumbai, India | 10K Fun Run</p>
+                                <a href="#" class="btn-rp btn-primary">Register Now</a>
+                            </div>
+                        </div>
+                        <div class="event-card" data-aos="fade-up" data-aos-delay="200">
+                            <div class="event-img">
+                                <img src="https://images.unsplash.com/photo-1461897104016-0b3b00cc81ee?w=600&q=85" alt="Event">
+                                <span class="event-date">NOV 22, 2026</span>
+                            </div>
+                            <div class="event-body">
+                                <h3 class="card-title">Highland Ultra</h3>
+                                <p class="event-meta">Ooty, India | 50K Trail Race</p>
+                                <a href="#" class="btn-rp btn-primary">Register Now</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- S7 LIVE RESULTS PREVIEW -->
+            <section style="background: var(--bg-secondary);">
+                <div class="container-rp">
+                    <div class="section-header" data-aos="fade-up">
+                        <span class="eyebrow">Real-Time</span>
+                        <h2 class="section-title">Live Leaderboard</h2>
+                        <div class="divider"></div>
+                        <p class="subtitle">Latest results from the Morning Sun 10K</p>
+                    </div>
+                    <div class="results-panel" data-aos="fade-up">
+                        <div class="table-responsive">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Rank</th>
+                                        <th>Name</th>
+                                        <th>Bib</th>
+                                        <th>Time</th>
+                                        <th>Pace</th>
+                                        <th>Cat</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td><div class="rank-badge rank-1">1</div></td>
+                                        <td>Arjun Kumar</td>
+                                        <td>1042</td>
+                                        <td class="time-col">00:31:42</td>
+                                        <td><div class="pace-track"><div class="pace-fill" style="width: 95%;"></div></div></td>
+                                        <td>M Open</td>
+                                    </tr>
+                                    <tr>
+                                        <td><div class="rank-badge rank-2">2</div></td>
+                                        <td>Sarah Mitchell</td>
+                                        <td>2115</td>
+                                        <td class="time-col">00:32:15</td>
+                                        <td><div class="pace-track"><div class="pace-fill" style="width: 92%;"></div></div></td>
+                                        <td>F Open</td>
+                                    </tr>
+                                    <tr>
+                                        <td><div class="rank-badge rank-3">3</div></td>
+                                        <td>Vikram Singh</td>
+                                        <td>1088</td>
+                                        <td class="time-col">00:33:04</td>
+                                        <td><div class="pace-track"><div class="pace-fill" style="width: 88%;"></div></div></td>
+                                        <td>M 35-44</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <a onclick="showPage('results')" class="btn-rp btn-outline" style="margin-top: 2rem;">View Full Results</a>
+                    </div>
+                </div>
+            </section>
+
+            <!-- S8 FINAL CTA -->
+            <section style="background: radial-gradient(circle at center, #131B2E 0%, #080C1A 100%);">
+                <div class="container-rp" data-aos="zoom-in">
+                    <h2 class="hero-title" style="font-size: clamp(2rem, 5vw, 3.5rem);">Ready to Time Your Next Masterpiece?</h2>
+                    <p class="subtitle" style="margin: 2rem auto;">Join the RacePulse network and experience the peak of event technology.</p>
+                    <div class="btn-group-center">
+                        <a onclick="showPage('contact')" class="btn-rp btn-primary">Request a Quote</a>
+                        <a onclick="showPage('about')" class="btn-rp btn-outline">Learn More</a>
+                    </div>
+                </div>
+            </section>
+        </div>
+
+        <!-- ── PAGE: HOME2 ── -->
+        <div id="page-home2" class="page">
+            <!-- S1 HERO -->
+            <section class="hero" style="background: radial-gradient(circle at center, var(--accent-coral) 0%, var(--bg-primary) 100%);">
+                <div class="hero-overlay" style="background: rgba(8, 12, 26, 0.4);"></div>
+                <div class="hero-content" data-aos="fade-up">
+                    <span class="eyebrow" style="color: var(--accent-gold);">Elite Timing</span>
+                    <h1 class="hero-title" style="color: var(--text-primary);">Every Second<br>Counts.</h1>
+                    <p class="subtitle" style="color: var(--text-primary); opacity: 0.9;">High-performance timing for the world's most competitive races.</p>
+                    <div class="btn-group-center">
+                        <a onclick="showPage('contact')" class="btn-rp btn-primary" style="background: var(--accent-gold); color: #080C1A;">Partner With Us</a>
+                        <a onclick="showPage('events')" class="btn-rp btn-outline" style="border-color: white; color: white;">Explore Events</a>
+                    </div>
+                </div>
+            </section>
+
+            <!-- S2 TECHNOLOGY GRID -->
+            <section>
+                <div class="container-rp">
+                    <div class="section-header" data-aos="fade-up">
+                        <span class="eyebrow">Our Stack</span>
+                        <h2 class="section-title">Cutting-Edge Tech</h2>
+                        <div class="divider"></div>
+                    </div>
+                    <div class="row g-4">
+                        <div class="col-md-3" data-aos="fade-up">
+                            <div class="glass-card">
+                                <div class="card-icon"><i class="fas fa-microchip"></i></div>
+                                <h3>RFID</h3>
+                                <p>Next-gen chips for high-density starts.</p>
+                            </div>
+                        </div>
+                        <div class="col-md-3" data-aos="fade-up" data-aos-delay="50">
+                            <div class="glass-card">
+                                <div class="card-icon"><i class="fas fa-broadcast-tower"></i></div>
+                                <h3>Sensors</h3>
+                                <p>Dual-mat redundancy at every split.</p>
+                            </div>
+                        </div>
+                        <div class="col-md-3" data-aos="fade-up" data-aos-delay="100">
+                            <div class="glass-card">
+                                <div class="card-icon"><i class="fas fa-cloud-upload-alt"></i></div>
+                                <h3>Cloud</h3>
+                                <p>Real-time sync with global portals.</p>
+                            </div>
+                        </div>
+                        <div class="col-md-3" data-aos="fade-up" data-aos-delay="150">
+                            <div class="glass-card">
+                                <div class="card-icon"><i class="fas fa-mobile-alt"></i></div>
+                                <h3>App</h3>
+                                <p>Mobile-first results for spectators.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- S3 GALLERY -->
+            <section style="background: var(--bg-secondary);">
+                <div class="container-rp">
+                    <div class="section-header" data-aos="fade-up">
+                        <span class="eyebrow">Moments</span>
+                        <h2 class="section-title">Race Gallery</h2>
+                        <div class="divider"></div>
+                    </div>
+                    <div class="img-grid">
+                        <div class="img-card"><img src="https://images.unsplash.com/photo-1571008887538-b36bb32f4571?w=600&q=85" alt="G1"></div>
+                        <div class="img-card"><img src="https://images.unsplash.com/photo-1502904550040-7534597429ae?w=600&q=85" alt="G2"></div>
+                        <div class="img-card"><img src="https://images.unsplash.com/photo-1560272564-c83b66b1ad12?w=600&q=85" alt="G3"></div>
+                        <div class="img-card"><img src="https://images.unsplash.com/photo-1551698618-1dfe5d97d256?w=600&q=85" alt="G4"></div>
+                        <div class="img-card"><img src="https://images.unsplash.com/photo-1542766788-a2f588f447ee?w=600&q=85" alt="G5"></div>
+                        <div class="img-card"><img src="https://images.unsplash.com/photo-1461897104016-0b3b00cc81ee?w=600&q=85" alt="G6"></div>
+                        <div class="img-card"><img src="https://images.unsplash.com/photo-1493770348161-369560ae357d?w=600&q=85" alt="G7"></div>
+                        <div class="img-card"><img src="https://images.unsplash.com/photo-1476480862126-209bfaa8edc8?w=600&q=85" alt="G8"></div>
+                        <div class="img-card"><img src="https://images.unsplash.com/photo-1526676037777-05a232554f77?w=600&q=85" alt="G9"></div>
+                        <div class="img-card"><img src="https://images.unsplash.com/photo-1531415074968-036ba1b575da?w=600&q=85" alt="G10"></div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- S4 TESTIMONIALS -->
+            <section>
+                <div class="container-rp">
+                    <div class="section-header" data-aos="fade-up">
+                        <span class="eyebrow">Voices</span>
+                        <h2 class="section-title">Organizer Stories</h2>
+                        <div class="divider"></div>
+                    </div>
+                    <div class="row g-4">
+                        <div class="col-md-4" data-aos="fade-up">
+                            <div class="glass-card">
+                                <div style="color: var(--accent-gold); margin-bottom: 1rem;"><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i></div>
+                                <p>"RacePulse transformed our city marathon. The live tracking was a game changer for spectators."</p>
+                                <h3 class="mt-3">Vikram Seth</h3>
+                                <p class="text-muted small">Mumbai Marathon Director</p>
+                            </div>
+                        </div>
+                        <div class="col-md-4" data-aos="fade-up" data-aos-delay="100">
+                            <div class="glass-card">
+                                <div style="color: var(--accent-gold); margin-bottom: 1rem;"><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i></div>
+                                <p>"Flawless execution. We had zero timing issues even with 10,000 runners crossing the line."</p>
+                                <h3 class="mt-3">Sarah J.</h3>
+                                <p class="text-muted small">Coastal 10K Organizer</p>
+                            </div>
+                        </div>
+                        <div class="col-md-4" data-aos="fade-up" data-aos-delay="200">
+                            <div class="glass-card">
+                                <div style="color: var(--accent-gold); margin-bottom: 1rem;"><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i></div>
+                                <p>"The most reliable timing partner we've ever worked with. Highly recommended."</p>
+                                <h3 class="mt-3">Mark Evans</h3>
+                                <p class="text-muted small">Elite Trail Races</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- S5 PARALLAX QUOTE -->
+            <div class="parallax-banner">
+                <div class="parallax-bg" style="background-image: url('https://images.unsplash.com/photo-1542766788-a2f588f447ee?w=1600');"></div>
+                <div class="parallax-overlay"></div>
+                <div class="parallax-content container-rp">
+                    <h2 class="hero-title" style="font-size: 3rem;">"Innovation is our starting line."</h2>
+                </div>
+            </div>
+
+            <!-- S6 HOW IT WORKS -->
+            <section>
+                <div class="container-rp">
+                    <div class="section-header">
+                        <span class="eyebrow">Process</span>
+                        <h2 class="section-title">How It Works</h2>
+                        <div class="divider"></div>
+                    </div>
+                    <div class="row g-4">
+                        <div class="col-md-3">
+                            <div class="glass-card">
+                                <div class="card-icon" style="background: var(--accent-teal); color: #080C1A; font-weight: 700;">1</div>
+                                <h3>Plan</h3>
+                                <p>Define course maps and split points.</p>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="glass-card">
+                                <div class="card-icon" style="background: var(--accent-teal); color: #080C1A; font-weight: 700;">2</div>
+                                <h3>Setup</h3>
+                                <p>Hardware deployment on race morning.</p>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="glass-card">
+                                <div class="card-icon" style="background: var(--accent-teal); color: #080C1A; font-weight: 700;">3</div>
+                                <h3>Race</h3>
+                                <p>Real-time data capture and verification.</p>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="glass-card">
+                                <div class="card-icon" style="background: var(--accent-teal); color: #080C1A; font-weight: 700;">4</div>
+                                <h3>Analyze</h3>
+                                <p>Final results and post-race reporting.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- S7 NEWSLETTER BAR -->
+            <section style="background: var(--bg-secondary); padding: 40px 0;">
+                <div class="container-rp">
+                    <div class="row align-items-center">
+                        <div class="col-lg-6 text-start">
+                            <h3 style="text-align: left; margin: 0;">Subscribe for Updates</h3>
+                        </div>
+                        <div class="col-lg-6">
+                            <form class="d-flex gap-2">
+                                <input type="email" class="form-control-rp" placeholder="Enter Email">
+                                <button class="btn-rp btn-primary">Join</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- S8 CTA -->
+            <section style="background: linear-gradient(135deg, var(--bg-primary) 0%, var(--bg-card) 100%);">
+                <div class="container-rp">
+                    <h2 class="section-title">Take the Lead</h2>
+                    <p class="subtitle">Experience the difference of professional race timing.</p>
+                    <a onclick="showPage('contact')" class="btn-rp btn-primary mt-4">Start Your Event</a>
+                </div>
+            </section>
+        </div>
+
+        <!-- ── PAGE: ABOUT ── -->
+        <div id="page-about" class="page">
+            <!-- S1 HERO -->
+            <section class="hero">
+                <div class="hero-bg">
+                    <img src="https://images.unsplash.com/photo-1531415074968-036ba1b575da?w=1600&q=90" alt="About us hero">
+                </div>
+                <div class="hero-overlay"></div>
+                <div class="hero-content">
+                    <span class="eyebrow">Our Story</span>
+                    <h1 class="page-title">Built By Runners,<br>For Runners</h1>
+                    <p class="subtitle">Since 2018, RacePulse has been at the forefront of timing innovation, ensuring every heartbeat and second is captured with absolute precision.</p>
+                </div>
+            </section>
+
+            <!-- S2 MISSION -->
+            <section>
+                <div class="container-rp">
+                    <div class="row align-items-center g-5">
+                        <div class="col-lg-6" data-aos="fade-right">
+                            <div class="img-wrap" style="height: 500px;">
+                                <img src="https://images.unsplash.com/photo-1493770348161-369560ae357d?w=800&q=85" alt="Mission">
+                            </div>
+                        </div>
+                        <div class="col-lg-6" data-aos="fade-left">
+                            <div class="text-start" style="text-align: left !important;">
+                                <span class="eyebrow" style="text-align: left;">Our Mission</span>
+                                <h2 class="section-title" style="text-align: left;">Capturing Excellence</h2>
+                                <div class="divider" style="margin-left: 0;"></div>
+                                <p class="text-secondary">At RacePulse, we believe that every participant deserves a professional experience. Whether it's a small local club run or a major international marathon, our goal is to provide the same level of elite technology and support.</p>
+                                <p class="text-secondary mt-3">We don't just provide times; we provide memories. Our platform integrates live photography and instant certificates to celebrate every finisher's achievement.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- S3 TEAM -->
+            <section style="background: var(--bg-secondary);">
+                <div class="container-rp">
+                    <div class="section-header">
+                        <span class="eyebrow">The Minds</span>
+                        <h2 class="section-title">Our Elite Team</h2>
+                        <div class="divider"></div>
+                    </div>
+                    <div class="img-grid" style="grid-template-columns: repeat(5, 1fr);">
+                        <!-- 10 team cards -->
+                        <div class="team-card" data-aos="fade-up">
+                            <div class="img-wrap" style="aspect-ratio: 1/1; border-radius: 50%; width: 120px; margin: 0 auto 1.5rem;">
+                                <img src="https://i.pravatar.cc/150?u=1" alt="Team member">
+                            </div>
+                            <h3>Rahul Dev</h3>
+                            <p class="text-muted small">CEO & Founder</p>
+                        </div>
+                        <div class="team-card" data-aos="fade-up" data-aos-delay="50">
+                            <div class="img-wrap" style="aspect-ratio: 1/1; border-radius: 50%; width: 120px; margin: 0 auto 1.5rem;">
+                                <img src="https://i.pravatar.cc/150?u=2" alt="Team member">
+                            </div>
+                            <h3>Ananya Iyer</h3>
+                            <p class="text-muted small">CTO</p>
+                        </div>
+                        <div class="team-card" data-aos="fade-up" data-aos-delay="100">
+                            <div class="img-wrap" style="aspect-ratio: 1/1; border-radius: 50%; width: 120px; margin: 0 auto 1.5rem;">
+                                <img src="https://i.pravatar.cc/150?u=3" alt="Team member">
+                            </div>
+                            <h3>Siddharth M.</h3>
+                            <p class="text-muted small">Lead Engineer</p>
+                        </div>
+                        <div class="team-card" data-aos="fade-up" data-aos-delay="150">
+                            <div class="img-wrap" style="aspect-ratio: 1/1; border-radius: 50%; width: 120px; margin: 0 auto 1.5rem;">
+                                <img src="https://i.pravatar.cc/150?u=4" alt="Team member">
+                            </div>
+                            <h3>Meera K.</h3>
+                            <p class="text-muted small">Operations</p>
+                        </div>
+                        <div class="team-card" data-aos="fade-up" data-aos-delay="200">
+                            <div class="img-wrap" style="aspect-ratio: 1/1; border-radius: 50%; width: 120px; margin: 0 auto 1.5rem;">
+                                <img src="https://i.pravatar.cc/150?u=5" alt="Team member">
+                            </div>
+                            <h3>Chris Evans</h3>
+                            <p class="text-muted small">Event Director</p>
+                        </div>
+                        <!-- row 2 -->
+                        <div class="team-card" data-aos="fade-up">
+                            <div class="img-wrap" style="aspect-ratio: 1/1; border-radius: 50%; width: 120px; margin: 0 auto 1.5rem;">
+                                <img src="https://i.pravatar.cc/150?u=6" alt="Team member">
+                            </div>
+                            <h3>Priya Singh</h3>
+                            <p class="text-muted small">DevOps</p>
+                        </div>
+                        <div class="team-card" data-aos="fade-up" data-aos-delay="50">
+                            <div class="img-wrap" style="aspect-ratio: 1/1; border-radius: 50%; width: 120px; margin: 0 auto 1.5rem;">
+                                <img src="https://i.pravatar.cc/150?u=7" alt="Team member">
+                            </div>
+                            <h3>David R.</h3>
+                            <p class="text-muted small">Hardware Specialist</p>
+                        </div>
+                        <div class="team-card" data-aos="fade-up" data-aos-delay="100">
+                            <div class="img-wrap" style="aspect-ratio: 1/1; border-radius: 50%; width: 120px; margin: 0 auto 1.5rem;">
+                                <img src="https://i.pravatar.cc/150?u=8" alt="Team member">
+                            </div>
+                            <h3>Sara J.</h3>
+                            <p class="text-muted small">UX Designer</p>
+                        </div>
+                        <div class="team-card" data-aos="fade-up" data-aos-delay="150">
+                            <div class="img-wrap" style="aspect-ratio: 1/1; border-radius: 50%; width: 120px; margin: 0 auto 1.5rem;">
+                                <img src="https://i.pravatar.cc/150?u=9" alt="Team member">
+                            </div>
+                            <h3>Kevin L.</h3>
+                            <p class="text-muted small">Support Lead</p>
+                        </div>
+                        <div class="team-card" data-aos="fade-up" data-aos-delay="200">
+                            <div class="img-wrap" style="aspect-ratio: 1/1; border-radius: 50%; width: 120px; margin: 0 auto 1.5rem;">
+                                <img src="https://i.pravatar.cc/150?u=10" alt="Team member">
+                            </div>
+                            <h3>Lisa W.</h3>
+                            <p class="text-muted small">Logistics</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- S4 VALUES -->
+            <section>
+                <div class="container-rp">
+                    <div class="row g-4">
+                        <div class="col-md-3" data-aos="fade-up">
+                            <div class="glass-card">
+                                <div class="card-icon"><i class="fas fa-check-circle"></i></div>
+                                <h3>Integrity</h3>
+                                <p>Unbiased results and transparent operations in every race.</p>
+                            </div>
+                        </div>
+                        <div class="col-md-3" data-aos="fade-up" data-aos-delay="100">
+                            <div class="glass-card">
+                                <div class="card-icon"><i class="fas fa-bolt"></i></div>
+                                <h3>Innovation</h3>
+                                <p>Constantly upgrading our hardware and software stack.</p>
+                            </div>
+                        </div>
+                        <div class="col-md-3" data-aos="fade-up" data-aos-delay="200">
+                            <div class="glass-card">
+                                <div class="card-icon"><i class="fas fa-heart"></i></div>
+                                <h3>Passion</h3>
+                                <p>Driven by the thrill of competition and achievement.</p>
+                            </div>
+                        </div>
+                        <div class="col-md-3" data-aos="fade-up" data-aos-delay="300">
+                            <div class="glass-card">
+                                <div class="card-icon"><i class="fas fa-users"></i></div>
+                                <h3>Community</h3>
+                                <p>Building a better running environment for everyone.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- S5 MILESTONE BANNER -->
+            <div class="parallax-banner">
+                <div class="parallax-bg" style="background-image: url('https://images.unsplash.com/photo-1542766788-a2f588f447ee?w=1600');"></div>
+                <div class="parallax-overlay"></div>
+                <div class="parallax-content">
+                    <h2 class="hero-title" style="font-size: 5rem;">2018 → 2026</h2>
+                    <p class="subtitle">A Journey of Continuous Excellence</p>
+                </div>
+            </div>
+
+            <!-- S6 ACHIEVEMENT STATS -->
+            <section>
+                <div class="container-rp">
+                    <div class="stats-grid">
+                        <div class="stat-item">
+                            <h3 class="counter" data-target="1000">0</h3>
+                            <p>Premium Partners</p>
+                        </div>
+                        <div class="stat-item">
+                            <h3 class="counter" data-target="50">0</h3>
+                            <p>Cities Covered</p>
+                        </div>
+                        <div class="stat-item">
+                            <h3 class="counter" data-target="5">0</h3>
+                            <p>Million Results</p>
+                        </div>
+                        <div class="stat-item">
+                            <h3 class="counter" data-target="12">0</h3>
+                            <p>Award Wins</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- S7 TIMELINE -->
+            <section style="background: var(--bg-secondary);">
+                <div class="container-rp">
+                    <div class="section-header">
+                        <span class="eyebrow">The Evolution</span>
+                        <h2 class="section-title">Our Timeline</h2>
+                        <div class="divider"></div>
+                    </div>
+                    <div class="timeline-wrap" style="position: relative; max-width: 800px; margin: 0 auto; padding: 2rem 0;">
+                        <div style="position: absolute; left: 50%; top: 0; bottom: 0; width: 2px; background: var(--accent-teal); transform: translateX(-50%);"></div>
+                        
+                        <div class="timeline-item" style="margin-bottom: 4rem; position: relative;" data-aos="fade-right">
+                            <div style="width: 45%; text-align: right; padding-right: 2rem;">
+                                <h3 class="timing-font" style="text-align: right; color: var(--accent-teal);">2018</h3>
+                                <p>RacePulse Founded in Chennai with a single UHF timing mat.</p>
+                            </div>
+                        </div>
+                        <div class="timeline-item" style="margin-bottom: 4rem; position: relative;" data-aos="fade-left">
+                            <div style="width: 45%; margin-left: 55%; text-align: left; padding-left: 2rem;">
+                                <h3 class="timing-font" style="text-align: left; color: var(--accent-teal);">2020</h3>
+                                <p>Launched our first proprietary Live Results Portal during the pandemic.</p>
+                            </div>
+                        </div>
+                        <div class="timeline-item" style="margin-bottom: 4rem; position: relative;" data-aos="fade-right">
+                            <div style="width: 45%; text-align: right; padding-right: 2rem;">
+                                <h3 class="timing-font" style="text-align: right; color: var(--accent-teal);">2022</h3>
+                                <p>Reached 1 Million runners milestone across 12 states.</p>
+                            </div>
+                        </div>
+                        <div class="timeline-item" style="margin-bottom: 4rem; position: relative;" data-aos="fade-left">
+                            <div style="width: 45%; margin-left: 55%; text-align: left; padding-left: 2rem;">
+                                <h3 class="timing-font" style="text-align: left; color: var(--accent-teal);">2024</h3>
+                                <p>Introduced AI-powered course photo matching technology.</p>
+                            </div>
+                        </div>
+                        <div class="timeline-item" style="position: relative;" data-aos="fade-right">
+                            <div style="width: 45%; text-align: right; padding-right: 2rem;">
+                                <h3 class="timing-font" style="text-align: right; color: var(--accent-teal);">2026</h3>
+                                <p>Scaling to global markets with cloud-native precision timing.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- S8 JOIN US CTA -->
+            <section>
+                <div class="container-rp">
+                    <h2 class="section-title">Be Part of the Pulse</h2>
+                    <p class="subtitle">Join our team of experts and help shape the future of racing.</p>
+                    <a href="#" class="btn-rp btn-primary" style="margin-top: 2rem;">View Openings</a>
+                </div>
+            </section>
+        </div>
+
+        <!-- ── PAGE: SERVICES ── -->
+        <div id="page-services" class="page">
+             <!-- S1 HERO -->
+             <section class="hero">
+                <div class="hero-bg">
+                    <img src="https://images.unsplash.com/photo-1551698618-1dfe5d97d256?w=1600&q=90" alt="Services hero">
+                </div>
+                <div class="hero-overlay"></div>
+                <div class="hero-content">
+                    <span class="eyebrow">What We Do</span>
+                    <h1 class="page-title">Elite Race<br>Solutions</h1>
+                    <p class="subtitle">Comprehensive timing and management services designed for events of every scale.</p>
+                </div>
+            </section>
+
+            <!-- S2 SERVICES GRID -->
+            <section>
+                <div class="container-rp">
+                    <div class="row g-4">
+                        <div class="col-lg-4 col-md-6" data-aos="fade-up">
+                            <div class="glass-card">
+                                <div class="card-icon"><i class="fas fa-running"></i></div>
+                                <h3>Marathon Timing</h3>
+                                <p>High-capacity systems capable of handling 50,000+ runners with split-second accuracy.</p>
+                            </div>
+                        </div>
+                        <div class="col-lg-4 col-md-6" data-aos="fade-up" data-aos-delay="50">
+                            <div class="glass-card">
+                                <div class="card-icon"><i class="fas fa-chart-bar"></i></div>
+                                <h3>Live Portal</h3>
+                                <p>Interactive leaderboards and real-time SMS/Email notifications for every split point.</p>
+                            </div>
+                        </div>
+                        <div class="col-lg-4 col-md-6" data-aos="fade-up" data-aos-delay="100">
+                            <div class="glass-card">
+                                <div class="card-icon"><i class="fas fa-qrcode"></i></div>
+                                <h3>Bib & Chip</h3>
+                                <p>Custom bib design, printing, and integrated RFID chip programming and distribution.</p>
+                            </div>
+                        </div>
+                        <div class="col-lg-4 col-md-6" data-aos="fade-up" data-aos-delay="150">
+                            <div class="glass-card">
+                                <div class="card-icon"><i class="fas fa-hands-helping"></i></div>
+                                <h3>Volunteer Coordination</h3>
+                                <p>Digital check-in systems and role management for event-day volunteers.</p>
+                            </div>
+                        </div>
+                        <div class="col-lg-4 col-md-6" data-aos="fade-up" data-aos-delay="200">
+                            <div class="glass-card">
+                                <div class="card-icon"><i class="fas fa-ad"></i></div>
+                                <h3>Sponsor Showcase</h3>
+                                <p>Digital placement for sponsors on results pages and live broadcast overlays.</p>
+                            </div>
+                        </div>
+                        <div class="col-lg-4 col-md-6" data-aos="fade-up" data-aos-delay="250">
+                            <div class="glass-card">
+                                <div class="card-icon"><i class="fas fa-user-plus"></i></div>
+                                <h3>Event Registration</h3>
+                                <p>Seamless online registration portal with integrated payment gateways and waivers.</p>
+                            </div>
+                        </div>
+                        <div class="col-lg-4 col-md-6 mx-lg-auto" data-aos="fade-up" data-aos-delay="300">
+                            <div class="glass-card">
+                                <div class="card-icon"><i class="fas fa-file-invoice-doll"></i></div>
+                                <h3>Post-Race Analytics</h3>
+                                <p>Deep-dive reports on participant demographics, pace trends, and event performance.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- S3 FEATURE COMPARISON -->
+            <section style="background: var(--bg-secondary);">
+                <div class="container-rp">
+                    <div class="section-header">
+                        <span class="eyebrow">Comparison</span>
+                        <h2 class="section-title">Timing Features</h2>
+                        <div class="divider"></div>
+                    </div>
+                    <div class="table-responsive" data-aos="fade-up">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Feature</th>
+                                    <th>Starter</th>
+                                    <th>Pro</th>
+                                    <th>Enterprise</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>Max Participants</td>
+                                    <td>500</td>
+                                    <td>5,000</td>
+                                    <td>Unlimited</td>
+                                </tr>
+                                <tr>
+                                    <td>Split Points</td>
+                                    <td>Start/Finish</td>
+                                    <td>Up to 4</td>
+                                    <td>Unlimited</td>
+                                </tr>
+                                <tr>
+                                    <td>Live SMS Alerts</td>
+                                    <td><i class="fas fa-times text-danger"></i></td>
+                                    <td><i class="fas fa-check text-success"></i></td>
+                                    <td><i class="fas fa-check text-success"></i></td>
+                                </tr>
+                                <tr>
+                                    <td>Custom Certificates</td>
+                                    <td>Standard</td>
+                                    <td>Premium</td>
+                                    <td>Fully Branded</td>
+                                </tr>
+                                <tr>
+                                    <td>On-Site Tech Support</td>
+                                    <td>Remote</td>
+                                    <td>2 Technicians</td>
+                                    <td>Full Team</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <!-- S4 PRICING -->
+            <section>
+                <div class="container-rp">
+                    <div class="section-header">
+                        <span class="eyebrow">Pricing</span>
+                        <h2 class="section-title">Flexible Packages</h2>
+                        <div class="divider"></div>
+                    </div>
+                    <div class="row g-4 justify-content-center">
+                        <div class="col-lg-4 col-md-6" data-aos="fade-up">
+                            <div class="glass-card">
+                                <h3>Starter</h3>
+                                <div class="timing-font" style="font-size: 2.5rem; color: var(--accent-teal); margin: 1rem 0;">$499</div>
+                                <p>Perfect for local club races and small fundraisers.</p>
+                                <ul class="list-unstyled text-start w-100 mt-4" style="color: var(--text-secondary);">
+                                    <li class="mb-2"><i class="fas fa-check me-2 text-teal"></i> Up to 500 Runners</li>
+                                    <li class="mb-2"><i class="fas fa-check me-2 text-teal"></i> Finish Line Timing</li>
+                                    <li class="mb-2"><i class="fas fa-check me-2 text-teal"></i> Basic Results Page</li>
+                                </ul>
+                                <a href="#" class="btn-rp btn-outline mt-4">Choose Starter</a>
+                            </div>
+                        </div>
+                        <div class="col-lg-4 col-md-6" data-aos="fade-up" data-aos-delay="100">
+                            <div class="glass-card" style="border-color: var(--accent-teal); transform: scale(1.05); box-shadow: var(--glow-teal);">
+                                <span class="badge bg-teal mb-3" style="background: var(--accent-teal); color: #080C1A;">MOST POPULAR</span>
+                                <h3>Pro</h3>
+                                <div class="timing-font" style="font-size: 2.5rem; color: var(--accent-teal); margin: 1rem 0;">$1,299</div>
+                                <p>Full-service timing for professional regional races.</p>
+                                <ul class="list-unstyled text-start w-100 mt-4" style="color: var(--text-secondary);">
+                                    <li class="mb-2"><i class="fas fa-check me-2 text-teal"></i> Up to 5,000 Runners</li>
+                                    <li class="mb-2"><i class="fas fa-check me-2 text-teal"></i> Multi-Point Splitting</li>
+                                    <li class="mb-2"><i class="fas fa-check me-2 text-teal"></i> SMS & Email Alerts</li>
+                                    <li class="mb-2"><i class="fas fa-check me-2 text-teal"></i> Live Leaderboards</li>
+                                </ul>
+                                <a href="#" class="btn-rp btn-primary mt-4">Choose Pro</a>
+                            </div>
+                        </div>
+                        <div class="col-lg-4 col-md-6" data-aos="fade-up" data-aos-delay="200">
+                            <div class="glass-card">
+                                <h3>Enterprise</h3>
+                                <div class="timing-font" style="font-size: 2.5rem; color: var(--accent-teal); margin: 1rem 0;">Custom</div>
+                                <p>Custom solutions for major city marathons.</p>
+                                <ul class="list-unstyled text-start w-100 mt-4" style="color: var(--text-secondary);">
+                                    <li class="mb-2"><i class="fas fa-check me-2 text-teal"></i> Unlimited Runners</li>
+                                    <li class="mb-2"><i class="fas fa-check me-2 text-teal"></i> Dedicated Hardware</li>
+                                    <li class="mb-2"><i class="fas fa-check me-2 text-teal"></i> Full On-Site Support</li>
+                                    <li class="mb-2"><i class="fas fa-check me-2 text-teal"></i> White-label Portal</li>
+                                </ul>
+                                <a href="#" class="btn-rp btn-outline mt-4">Contact Sales</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- S5 TECH DEEP-DIVE -->
+            <section style="background: var(--bg-secondary);">
+                <div class="container-rp">
+                    <div class="row align-items-center g-5 mb-5">
+                        <div class="col-lg-6" data-aos="fade-right">
+                            <div class="img-wrap" style="height: 400px;">
+                                <img src="https://images.unsplash.com/photo-1542766788-a2f588f447ee?w=800&q=85" alt="Hardware">
+                            </div>
+                        </div>
+                        <div class="col-lg-6 text-start" data-aos="fade-left">
+                            <h3 class="card-title" style="text-align: left;">Industrial Grade Hardware</h3>
+                            <p>Our RFID mats are built to withstand heavy foot traffic and extreme weather conditions. With dual-redundant systems at every point, we ensure zero data loss.</p>
+                        </div>
+                    </div>
+                    <div class="row align-items-center g-5">
+                        <div class="col-lg-6 order-lg-2" data-aos="fade-left">
+                            <div class="img-wrap" style="height: 400px;">
+                                <img src="https://images.unsplash.com/photo-1526676037777-05a232554f77?w=800&q=85" alt="Software">
+                            </div>
+                        </div>
+                        <div class="col-lg-6 text-start order-lg-1" data-aos="fade-right">
+                            <h3 class="card-title" style="text-align: left;">Cloud-Sync Results</h3>
+                            <p>Every split time is instantly synced to the cloud, allowing spectators worldwide to follow their favorite runners in real-time with less than 1-second latency.</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- S6 PARALLAX CTA -->
+            <div class="parallax-banner">
+                <div class="parallax-bg" style="background-image: url('https://images.unsplash.com/photo-1571008887538-b36bb32f4571?w=1600');"></div>
+                <div class="parallax-overlay"></div>
+                <div class="parallax-content container-rp">
+                    <h2 class="section-title">Ready to Elevate Your Race?</h2>
+                    <a onclick="showPage('contact')" class="btn-rp btn-primary" style="margin-top: 2rem;">Get a Quote</a>
+                </div>
+            </div>
+
+            <!-- S7 FAQ -->
+            <section>
+                <div class="container-rp">
+                    <div class="section-header">
+                        <span class="eyebrow">Common Questions</span>
+                        <h2 class="section-title">FAQs</h2>
+                        <div class="divider"></div>
+                    </div>
+                    <div class="accordion accordion-flush" id="faqAccordion" style="max-width: 800px; margin: 0 auto; text-align: left;">
+                        <div class="accordion-item bg-transparent" style="border-bottom: 1px solid var(--border);">
+                            <h2 class="accordion-header">
+                                <button class="accordion-button collapsed bg-transparent" type="button" data-bs-toggle="collapse" data-bs-target="#faq1" style="font-family: var(--font-body); font-weight: 600; color: var(--text-primary);">
+                                    How accurate is the RFID timing?
+                                </button>
+                            </h2>
+                            <div id="faq1" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                                <div class="accordion-body text-secondary">
+                                    Our dual-frequency systems provide a 99.9% read rate accuracy, even in high-density mass starts.
+                                </div>
+                            </div>
+                        </div>
+                        <div class="accordion-item bg-transparent" style="border-bottom: 1px solid var(--border);">
+                            <h2 class="accordion-header">
+                                <button class="accordion-button collapsed bg-transparent" type="button" data-bs-toggle="collapse" data-bs-target="#faq2" style="font-family: var(--font-body); font-weight: 600; color: var(--text-primary);">
+                                    Do you provide results immediately?
+                                </button>
+                            </h2>
+                            <div id="faq2" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                                <div class="accordion-body text-secondary">
+                                    Yes, results are updated live on our portal as runners cross each checkpoint.
+                                </div>
+                            </div>
+                        </div>
+                        <div class="accordion-item bg-transparent" style="border-bottom: 1px solid var(--border);">
+                            <h2 class="accordion-header">
+                                <button class="accordion-button collapsed bg-transparent" type="button" data-bs-toggle="collapse" data-bs-target="#faq3" style="font-family: var(--font-body); font-weight: 600; color: var(--text-primary);">
+                                    Can you ship timing chips nationwide?
+                                </button>
+                            </h2>
+                            <div id="faq3" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                                <div class="accordion-body text-secondary">
+                                    Absolutely. We handle all logistics, including programmed bib delivery to your race office.
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- S8 CONTACT CTA -->
+            <section style="background: radial-gradient(circle at center, #131B2E 0%, #080C1A 100%);">
+                <div class="container-rp">
+                    <h2 class="section-title">Need a Custom Solution?</h2>
+                    <p class="subtitle">Our experts are ready to design a timing plan specific to your event needs.</p>
+                    <a onclick="showPage('contact')" class="btn-rp btn-primary" style="margin-top: 2rem;">Message Us</a>
+                </div>
+            </section>
+        </div>
+
+        <!-- ── PAGE: EVENTS ── -->
+        <div id="page-events" class="page">
+             <!-- S1 HERO -->
+             <section class="hero">
+                <div class="hero-bg">
+                    <img src="https://images.unsplash.com/photo-1461897104016-0b3b00cc81ee?w=1600&q=90" alt="Events hero">
+                </div>
+                <div class="hero-overlay"></div>
+                <div class="hero-content">
+                    <span class="eyebrow">Race Calendar</span>
+                    <h1 class="page-title">Race Calendar<br>2026</h1>
+                    <p class="subtitle">Find your next challenge. Register today for India's premier racing events.</p>
+                </div>
+            </section>
+
+            <!-- S2 FEATURED EVENT -->
+            <section>
+                <div class="container-rp">
+                    <div class="featured-event-card" data-aos="zoom-in" style="position: relative; border-radius: 20px; overflow: hidden; height: 500px;">
+                        <img src="https://images.unsplash.com/photo-1571008887538-b36bb32f4571?w=1200&q=90" alt="Featured event" style="width: 100%; height: 100%; object-fit: cover;">
+                        <div class="hero-overlay" style="background: linear-gradient(to top, rgba(8,12,26,0.95) 0%, transparent 60%);"></div>
+                        <div style="position: absolute; bottom: 3rem; left: 3rem; right: 3rem; z-index: 3; text-align: left;">
+                            <span class="eyebrow" style="color: var(--accent-gold);">FEATURED RACE</span>
+                            <h2 class="hero-title" style="text-align: left; font-size: 3rem; margin-bottom: 1rem;">The Golden City Marathon</h2>
+                            <p class="subtitle" style="text-align: left; margin: 0 0 2rem 0; color: white;">The biggest race of the year is back. Run through the heart of history.</p>
+                            <a href="#" class="btn-rp btn-primary">Register Now</a>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- S3 EVENT GRID -->
+            <section style="background: var(--bg-secondary);">
+                <div class="container-rp">
+                    <div class="event-grid">
+                        <div class="event-card" data-aos="fade-up">
+                            <div class="event-img">
+                                <img src="https://images.unsplash.com/photo-1502904550040-7534597429ae?w=600&q=85" alt="Event">
+                                <span class="event-date">JUN 15</span>
+                            </div>
+                            <div class="event-body">
+                                <h3 class="card-title">Summer Heat 5K</h3>
+                                <p class="event-meta">Pune | 5K Run | 120 Spots Left</p>
+                                <a href="#" class="btn-rp btn-primary">Register</a>
+                            </div>
+                        </div>
+                        <div class="event-card" data-aos="fade-up" data-aos-delay="50">
+                            <div class="event-img">
+                                <img src="https://images.unsplash.com/photo-1560272564-c83b66b1ad12?w=600&q=85" alt="Event">
+                                <span class="event-date">JUL 20</span>
+                            </div>
+                            <div class="event-body">
+                                <h3 class="card-title">Monsoon Trail 21K</h3>
+                                <p class="event-meta">Mahabaleshwar | Half Marathon | 80 Spots Left</p>
+                                <a href="#" class="btn-rp btn-primary">Register</a>
+                            </div>
+                        </div>
+                        <div class="event-card" data-aos="fade-up" data-aos-delay="100">
+                            <div class="event-img">
+                                <img src="https://images.unsplash.com/photo-1551698618-1dfe5d97d256?w=600&q=85" alt="Event">
+                                <span class="event-date">AUG 10</span>
+                            </div>
+                            <div class="event-body">
+                                <h3 class="card-title">Freedom Run 10K</h3>
+                                <p class="event-meta">New Delhi | 10K & 5K | 400 Spots Left</p>
+                                <a href="#" class="btn-rp btn-primary">Register</a>
+                            </div>
+                        </div>
+                        <div class="event-card" data-aos="fade-up">
+                            <div class="event-img">
+                                <img src="https://images.unsplash.com/photo-1542766788-a2f588f447ee?w=600&q=85" alt="Event">
+                                <span class="event-date">SEP 12</span>
+                            </div>
+                            <div class="event-body">
+                                <h3 class="card-title">Coastal Marathon</h3>
+                                <p class="event-meta">Chennai | Full & Half | 150 Spots Left</p>
+                                <a href="#" class="btn-rp btn-primary">Register</a>
+                            </div>
+                        </div>
+                        <div class="event-card" data-aos="fade-up" data-aos-delay="50">
+                            <div class="event-img">
+                                <img src="https://images.unsplash.com/photo-1461897104016-0b3b00cc81ee?w=600&q=85" alt="Event">
+                                <span class="event-date">OCT 05</span>
+                            </div>
+                            <div class="event-body">
+                                <h3 class="card-title">City Lights 10K</h3>
+                                <p class="event-meta">Mumbai | 10K Fun Run | 500 Spots Left</p>
+                                <a href="#" class="btn-rp btn-primary">Register</a>
+                            </div>
+                        </div>
+                        <div class="event-card" data-aos="fade-up" data-aos-delay="100">
+                            <div class="event-img">
+                                <img src="https://images.unsplash.com/photo-1493770348161-369560ae357d?w=600&q=85" alt="Event">
+                                <span class="event-date">NOV 22</span>
+                            </div>
+                            <div class="event-body">
+                                <h3 class="card-title">Highland Ultra</h3>
+                                <p class="event-meta">Ooty | 50K Trail | 20 Spots Left</p>
+                                <a href="#" class="btn-rp btn-primary">Register</a>
+                            </div>
+                        </div>
+                        <div class="event-card mx-lg-auto" data-aos="fade-up" data-aos-delay="150">
+                            <div class="event-img">
+                                <img src="https://images.unsplash.com/photo-1476480862126-209bfaa8edc8?w=600&q=85" alt="Event">
+                                <span class="event-date">DEC 15</span>
+                            </div>
+                            <div class="event-body">
+                                <h3 class="card-title">Year End Dash</h3>
+                                <p class="event-meta">Bangalore | 10K | 300 Spots Left</p>
+                                <a href="#" class="btn-rp btn-primary">Register</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- S4 MAP SECTION -->
+            <section>
+                <div class="container-rp">
+                    <div class="section-header">
+                        <span class="eyebrow">Locations</span>
+                        <h2 class="section-title">Where We Race</h2>
+                        <div class="divider"></div>
+                    </div>
+                    <div style="height: 400px; background: var(--bg-secondary); border-radius: 20px; display: flex; align-items: center; justify-content: center; position: relative; border: 1px solid var(--border);">
+                        <i class="fas fa-map-marked-alt" style="font-size: 5rem; color: var(--accent-teal); opacity: 0.2;"></i>
+                        <div style="position: absolute; top: 20%; left: 30%; background: var(--accent-teal); color: #080C1A; padding: 5px 15px; border-radius: 20px; font-size: 0.8rem; font-weight: 700;">Mumbai</div>
+                        <div style="position: absolute; top: 40%; left: 50%; background: var(--accent-teal); color: #080C1A; padding: 5px 15px; border-radius: 20px; font-size: 0.8rem; font-weight: 700;">Bangalore</div>
+                        <div style="position: absolute; top: 60%; left: 70%; background: var(--accent-teal); color: #080C1A; padding: 5px 15px; border-radius: 20px; font-size: 0.8rem; font-weight: 700;">Chennai</div>
+                        <div style="position: absolute; top: 10%; left: 60%; background: var(--accent-teal); color: #080C1A; padding: 5px 15px; border-radius: 20px; font-size: 0.8rem; font-weight: 700;">Delhi</div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- S5 PAST EVENTS -->
+            <section style="background: var(--bg-secondary);">
+                <div class="container-rp">
+                    <div class="section-header">
+                        <span class="eyebrow">History</span>
+                        <h2 class="section-title">Past Events</h2>
+                        <div class="divider"></div>
+                    </div>
+                    <div class="row g-4">
+                        <div class="col-md-4" data-aos="fade-up">
+                            <div class="glass-card">
+                                <h3>Spring Run 2026</h3>
+                                <p>1,200 Runners | Completed</p>
+                                <a onclick="showPage('results')" class="btn-rp btn-outline btn-card">View Results</a>
+                            </div>
+                        </div>
+                        <div class="col-md-4" data-aos="fade-up" data-aos-delay="100">
+                            <div class="glass-card">
+                                <h3>Night Glow 5K</h3>
+                                <p>850 Runners | Completed</p>
+                                <a onclick="showPage('results')" class="btn-rp btn-outline btn-card">View Results</a>
+                            </div>
+                        </div>
+                        <div class="col-md-4" data-aos="fade-up" data-aos-delay="200">
+                            <div class="glass-card">
+                                <h3>Hill Climb 2025</h3>
+                                <p>500 Runners | Completed</p>
+                                <a onclick="showPage('results')" class="btn-rp btn-outline btn-card">View Results</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- S6 PARALLAX BANNER -->
+            <div class="parallax-banner">
+                <div class="parallax-bg" style="background-image: url('https://images.unsplash.com/photo-1526676037777-05a232554f77?w=1600');"></div>
+                <div class="parallax-overlay"></div>
+                <div class="parallax-content">
+                    <h2 class="section-title">Organizing a Race?</h2>
+                    <p class="subtitle">Let us handle the technical details so you can focus on the experience.</p>
+                </div>
+            </div>
+
+            <!-- S7 VOLUNTEER -->
+            <section>
+                <div class="container-rp">
+                    <div class="row align-items-center g-5">
+                        <div class="col-lg-6" data-aos="fade-right">
+                            <div class="img-wrap" style="height: 400px;">
+                                <img src="https://images.unsplash.com/photo-1551698618-1dfe5d97d256?w=800&q=85" alt="Volunteer">
+                            </div>
+                        </div>
+                        <div class="col-lg-6 text-start" data-aos="fade-left">
+                            <span class="eyebrow">Support Us</span>
+                            <h2 class="section-title" style="text-align: left;">Volunteer with Us</h2>
+                            <p>RacePulse events are powered by people like you. Join our crew to gain experience in race management and event technology.</p>
+                            <a href="#" class="btn-rp btn-primary mt-3">Sign Up to Volunteer</a>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- S8 NEWSLETTER -->
+            <section style="background: radial-gradient(circle at center, #131B2E 0%, #080C1A 100%);">
+                <div class="container-rp">
+                    <h2 class="section-title">Stay Updated</h2>
+                    <p class="subtitle">Get the latest race announcements delivered to your inbox.</p>
+                    <form class="mt-4" style="max-width: 500px; margin: 0 auto; display: flex; gap: 1rem;">
+                        <input type="email" class="form-control-rp" placeholder="Email Address" required>
+                        <button type="submit" class="btn-rp btn-primary" style="min-width: 100px;">Join</button>
+                    </form>
+                </div>
+            </section>
+        </div>
+
+        <!-- ── PAGE: LIVE RESULTS ── -->
+        <div id="page-results" class="page">
+             <!-- S1 HERO -->
+             <section class="hero">
+                <div class="hero-bg">
+                    <img src="https://images.unsplash.com/photo-1502904550040-7534597429ae?w=1600&q=90" alt="Results hero">
+                </div>
+                <div class="hero-overlay"></div>
+                <div class="hero-content">
+                    <div style="display: flex; align-items: center; justify-content: center; gap: 10px; margin-bottom: 1rem;">
+                        <div style="width: 12px; height: 12px; background: #FF3D5A; border-radius: 50%; animation: pulse 1.5s infinite;"></div>
+                        <span class="eyebrow" style="margin-bottom: 0; color: #FF3D5A;">LIVE</span>
+                    </div>
+                    <h1 class="page-title">Today's Results</h1>
+                    <p class="subtitle">Real-time data from the Summer Heat 5K. Results are provisional until verified.</p>
+                </div>
+            </section>
+
+            <!-- S2 5K MEN -->
+            <section>
+                <div class="container-rp">
+                    <div class="section-header">
+                        <h2 class="section-title">5K Men · Top 10</h2>
+                        <div class="divider"></div>
+                    </div>
+                    <div class="results-panel" data-aos="fade-up">
+                        <div class="table-responsive">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Rank</th>
+                                        <th>Name</th>
+                                        <th>Bib</th>
+                                        <th>Time</th>
+                                        <th>Pace</th>
+                                        <th>Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr><td><div class="rank-badge rank-1">1</div></td><td>Amit Sharma</td><td>302</td><td class="time-col">00:15:42</td><td>3:08/km</td><td>Finished</td></tr>
+                                    <tr><td><div class="rank-badge rank-2">2</div></td><td>Rohan Das</td><td>315</td><td class="time-col">00:16:05</td><td>3:13/km</td><td>Finished</td></tr>
+                                    <tr><td><div class="rank-badge rank-3">3</div></td><td>Sunny K.</td><td>388</td><td class="time-col">00:16:34</td><td>3:18/km</td><td>Finished</td></tr>
+                                    <tr><td>4</td><td>Varun M.</td><td>312</td><td class="time-col">00:17:10</td><td>3:26/km</td><td>Finished</td></tr>
+                                    <tr><td>5</td><td>Deepak R.</td><td>345</td><td class="time-col">00:17:45</td><td>3:33/km</td><td>Finished</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- S3 5K WOMEN -->
+            <section style="background: var(--bg-secondary);">
+                <div class="container-rp">
+                    <div class="section-header">
+                        <h2 class="section-title">5K Women · Top 10</h2>
+                        <div class="divider"></div>
+                    </div>
+                    <div class="results-panel" data-aos="fade-up">
+                        <div class="table-responsive">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Rank</th>
+                                        <th>Name</th>
+                                        <th>Bib</th>
+                                        <th>Time</th>
+                                        <th>Pace</th>
+                                        <th>Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr><td><div class="rank-badge rank-1">1</div></td><td>Priya Iyer</td><td>402</td><td class="time-col">00:18:12</td><td>3:38/km</td><td>Finished</td></tr>
+                                    <tr><td><div class="rank-badge rank-2">2</div></td><td>Sana Khan</td><td>415</td><td class="time-col">00:18:45</td><td>3:45/km</td><td>Finished</td></tr>
+                                    <tr><td><div class="rank-badge rank-3">3</div></td><td>Anjali S.</td><td>488</td><td class="time-col">00:19:20</td><td>3:52/km</td><td>Finished</td></tr>
+                                    <tr><td>4</td><td>Meghna P.</td><td>412</td><td class="time-col">00:20:05</td><td>4:01/km</td><td>Finished</td></tr>
+                                    <tr><td>5</td><td>Ritu V.</td><td>445</td><td class="time-col">00:20:45</td><td>4:09/km</td><td>Finished</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- S4 10K OPEN -->
+            <section>
+                <div class="container-rp">
+                    <div class="section-header">
+                        <h2 class="section-title">10K Open · Top 10</h2>
+                        <div class="divider"></div>
+                    </div>
+                    <div class="results-panel" data-aos="fade-up">
+                        <div class="table-responsive">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Rank</th>
+                                        <th>Name</th>
+                                        <th>Bib</th>
+                                        <th>Time</th>
+                                        <th>Pace</th>
+                                        <th>Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr><td><div class="rank-badge rank-1">1</div></td><td>Karan Singh</td><td>1002</td><td class="time-col">00:32:42</td><td>3:16/km</td><td>Finished</td></tr>
+                                    <tr><td><div class="rank-badge rank-2">2</div></td><td>John Doe</td><td>1015</td><td class="time-col">00:33:15</td><td>3:19/km</td><td>Finished</td></tr>
+                                    <tr><td><div class="rank-badge rank-3">3</div></td><td>Mike R.</td><td>1088</td><td class="time-col">00:34:20</td><td>3:26/km</td><td>Finished</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- S5 HALF MARATHON -->
+            <section style="background: var(--bg-secondary);">
+                <div class="container-rp">
+                    <div class="section-header">
+                        <h2 class="section-title">Half Marathon Results</h2>
+                        <div class="divider"></div>
+                    </div>
+                    <div class="results-panel" data-aos="fade-up">
+                         <p class="subtitle">Race in progress. Current leader: <strong>Rajiv Malhotra (Bib 2042)</strong> @ 15km</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- S6 AGE GROUP WINNERS -->
+            <section>
+                <div class="container-rp">
+                    <div class="section-header">
+                        <h2 class="section-title">Age Group Winners</h2>
+                        <div class="divider"></div>
+                    </div>
+                    <div class="row g-4">
+                        <div class="col-md-4">
+                            <div class="glass-card">
+                                <h3>40-49 Category</h3>
+                                <p>Male: Sanjay V. (00:38:12)<br>Female: Rekha M. (00:42:05)</p>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="glass-card">
+                                <h3>50-59 Category</h3>
+                                <p>Male: Harish R. (00:41:45)<br>Female: Shanti S. (00:45:30)</p>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="glass-card">
+                                <h3>60+ Category</h3>
+                                <p>Male: Balram K. (00:46:12)<br>Female: Geeta P. (00:52:10)</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- S7 OVERALL PODIUM -->
+            <section style="background: var(--bg-secondary);">
+                <div class="container-rp">
+                    <div class="section-header">
+                        <h2 class="section-title">Overall Podium</h2>
+                        <div class="divider"></div>
+                    </div>
+                    <div class="podium-wrap">
+                        <div class="podium-block">
+                            <div class="podium-info"><img src="https://i.pravatar.cc/100?u=1" alt="1st" style="border-radius: 50%; border: 3px solid var(--accent-gold); margin: 0 auto;"><div class="podium-name">Amit Sharma</div></div>
+                            <div class="podium-bar podium-1"><span>1st</span></div>
+                        </div>
+                        <div class="podium-block">
+                            <div class="podium-info"><img src="https://i.pravatar.cc/100?u=2" alt="2nd" style="border-radius: 50%; border: 3px solid #C0C0C0; margin: 0 auto;"><div class="podium-name">Rohan Das</div></div>
+                            <div class="podium-bar podium-2"><span>2nd</span></div>
+                        </div>
+                        <div class="podium-block">
+                            <div class="podium-info"><img src="https://i.pravatar.cc/100?u=3" alt="3rd" style="border-radius: 50%; border: 3px solid #CD7F32; margin: 0 auto;"><div class="podium-name">Sunny K.</div></div>
+                            <div class="podium-bar podium-3"><span>3rd</span></div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- S8 EXPORT CTA -->
+            <section>
+                <div class="container-rp">
+                    <h2 class="section-title">Download Results</h2>
+                    <div class="btn-group-center mt-4">
+                        <a href="#" class="btn-rp btn-primary"><i class="fas fa-file-pdf me-2"></i>PDF</a>
+                        <a href="#" class="btn-rp btn-outline"><i class="fas fa-file-csv me-2"></i>CSV</a>
+                        <a href="#" class="btn-rp btn-outline"><i class="fas fa-file-excel me-2"></i>EXCEL</a>
+                    </div>
+                </div>
+            </section>
+        </div>
+
+        <!-- ── PAGE: SPONSORS ── -->
+        <div id="page-sponsors" class="page">
+             <!-- S1 HERO -->
+             <section class="hero">
+                <div class="hero-bg">
+                    <img src="https://images.unsplash.com/photo-1542766788-a2f588f447ee?w=1600&q=90" alt="Sponsors hero">
+                </div>
+                <div class="hero-overlay"></div>
+                <div class="hero-content">
+                    <span class="eyebrow">Our Partners</span>
+                    <h1 class="page-title">Fueling the<br>Journey</h1>
+                    <p class="subtitle">Meet the brands that make our world-class racing events possible.</p>
+                </div>
+            </section>
+
+            <!-- S2 PLATINUM -->
+            <section class="sponsor-tier">
+                <div class="container-rp">
+                    <div class="section-header">
+                        <span class="eyebrow" style="color: var(--accent-teal);">PLATINUM TIER</span>
+                        <h2 class="section-title">Global Partners</h2>
+                        <div class="divider"></div>
+                    </div>
+                    <div class="sponsor-grid tier-platinum">
+                        <div class="sponsor-card" data-aos="zoom-in">
+                            <div class="sponsor-logo"><img src="https://upload.wikimedia.org/wikipedia/commons/a/a6/Logo_NIKE.svg" alt="Nike"></div>
+                            <span class="tier-badge" style="background: var(--accent-teal); color: #080C1A;">Platinum</span>
+                            <h3 class="card-title">Nike India</h3>
+                            <a href="#" class="text-teal">Visit Website</a>
+                        </div>
+                        <div class="sponsor-card" data-aos="zoom-in" data-aos-delay="100">
+                            <div class="sponsor-logo"><img src="https://upload.wikimedia.org/wikipedia/commons/2/20/Adidas_Logo.svg" alt="Adidas"></div>
+                            <span class="tier-badge" style="background: var(--accent-teal); color: #080C1A;">Platinum</span>
+                            <h3 class="card-title">Adidas Performance</h3>
+                            <a href="#" class="text-teal">Visit Website</a>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- S3 GOLD -->
+            <section class="sponsor-tier" style="background: var(--bg-secondary);">
+                <div class="container-rp">
+                    <div class="section-header">
+                        <span class="eyebrow" style="color: var(--accent-gold);">GOLD TIER</span>
+                        <h2 class="section-title">Official Sponsors</h2>
+                        <div class="divider"></div>
+                    </div>
+                    <div class="sponsor-grid tier-gold">
+                        <div class="sponsor-card" data-aos="fade-up">
+                            <div class="sponsor-logo"><img src="https://upload.wikimedia.org/wikipedia/en/e/e7/Red_Bull_logo.svg" alt="Red Bull"></div>
+                            <h3 class="card-title">Red Bull</h3>
+                        </div>
+                        <div class="sponsor-card" data-aos="fade-up" data-aos-delay="100">
+                            <div class="sponsor-logo"><img src="https://upload.wikimedia.org/wikipedia/commons/b/bb/Garmin_logo.svg" alt="Garmin"></div>
+                            <h3 class="card-title">Garmin</h3>
+                        </div>
+                        <div class="sponsor-card" data-aos="fade-up" data-aos-delay="200">
+                            <div class="sponsor-logo"><img src="https://upload.wikimedia.org/wikipedia/commons/f/fa/Apple_logo_black.svg" alt="Apple"></div>
+                            <h3 class="card-title">Apple Watch</h3>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- S4 SILVER -->
+            <section class="sponsor-tier">
+                <div class="container-rp">
+                    <div class="section-header">
+                        <span class="eyebrow">SILVER TIER</span>
+                        <h2 class="section-title">Support Sponsors</h2>
+                        <div class="divider"></div>
+                    </div>
+                    <div class="sponsor-grid tier-silver">
+                        <div class="sponsor-card"><h3>HydraPlus</h3></div>
+                        <div class="sponsor-card"><h3>RunTech</h3></div>
+                        <div class="sponsor-card"><h3>HealthFirst</h3></div>
+                        <div class="sponsor-card"><h3>EcoTrack</h3></div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- S5 BRONZE -->
+            <section class="sponsor-tier" style="background: var(--bg-secondary);">
+                <div class="container-rp">
+                    <div class="section-header">
+                        <span class="eyebrow">BRONZE TIER</span>
+                        <h2 class="section-title">Community Sponsors</h2>
+                        <div class="divider"></div>
+                    </div>
+                    <div class="sponsor-grid tier-bronze">
+                        <div class="sponsor-card"><h3>Local Cafe</h3></div>
+                        <div class="sponsor-card"><h3>GymX</h3></div>
+                        <div class="sponsor-card"><h3>YogaLife</h3></div>
+                        <div class="sponsor-card"><h3>PhysioGo</h3></div>
+                        <div class="sponsor-card"><h3>MedCare</h3></div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- S6 COMMUNITY PARTNERS -->
+            <section>
+                <div class="container-rp">
+                    <div class="section-header">
+                        <h2 class="section-title">Community Partners</h2>
+                        <div class="divider"></div>
+                    </div>
+                    <div class="d-flex flex-wrap justify-content-center gap-3">
+                        <span class="btn-rp btn-outline" style="border-radius: 50px; min-width: 120px; padding: 10px 20px;">Chennai Runners</span>
+                        <span class="btn-rp btn-outline" style="border-radius: 50px; min-width: 120px; padding: 10px 20px;">Mumbai Striders</span>
+                        <span class="btn-rp btn-outline" style="border-radius: 50px; min-width: 120px; padding: 10px 20px;">Bangalore Roadies</span>
+                        <span class="btn-rp btn-outline" style="border-radius: 50px; min-width: 120px; padding: 10px 20px;">Delhi Dashers</span>
+                        <span class="btn-rp btn-outline" style="border-radius: 50px; min-width: 120px; padding: 10px 20px;">Pune Pacers</span>
+                    </div>
+                </div>
+            </section>
+
+            <!-- S7 BECOME A SPONSOR -->
+            <section style="background: var(--bg-secondary);">
+                <div class="container-rp">
+                    <div class="section-header">
+                        <span class="eyebrow">Opportunities</span>
+                        <h2 class="section-title">Sponsorship Packages</h2>
+                        <div class="divider"></div>
+                    </div>
+                    <div class="row g-4">
+                        <div class="col-md-4">
+                            <div class="glass-card">
+                                <span class="eyebrow" style="color: var(--accent-teal);">PACKAGE 1</span>
+                                <h3>Title Sponsor</h3>
+                                <p>Exclusive brand placement across all event materials and results portal.</p>
+                                <a href="#" class="btn-rp btn-primary mt-3">Enquire</a>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="glass-card">
+                                <span class="eyebrow" style="color: var(--accent-coral);">PACKAGE 2</span>
+                                <h3>Event Sponsor</h3>
+                                <h3 class="timing-font">$5,000</h3>
+                                <p>High visibility at start/finish lines and social media integration.</p>
+                                <a href="#" class="btn-rp btn-primary mt-3">Enquire</a>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="glass-card">
+                                <span class="eyebrow" style="color: var(--accent-gold);">PACKAGE 3</span>
+                                <h3>Community Partner</h3>
+                                <h3 class="timing-font">$1,000</h3>
+                                <p>Brand mention in pre-race emails and inclusion in physical goody bags.</p>
+                                <a href="#" class="btn-rp btn-primary mt-3">Enquire</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- S8 SPONSOR CONTACT FORM -->
+            <section>
+                <div class="container-rp">
+                    <div class="section-header">
+                        <h2 class="section-title">Sponsorship Inquiry</h2>
+                        <div class="divider"></div>
+                    </div>
+                    <form class="contact-grid" id="sponsorForm">
+                        <div class="form-group">
+                            <label>Company Name</label>
+                            <input type="text" class="form-control-rp" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Budget Range</label>
+                            <select class="form-control-rp">
+                                <option>$1,000 - $5,000</option>
+                                <option>$5,000 - $10,000</option>
+                                <option>$10,000+</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Message</label>
+                            <textarea class="form-control-rp" rows="4" required></textarea>
+                        </div>
+                        <button type="submit" class="btn-rp btn-primary w-100">Send Inquiry</button>
+                    </form>
+                </div>
+            </section>
+        </div>
+
+        <!-- ── PAGE: CONTACT ── -->
+        <div id="page-contact" class="page">
+             <!-- S1 HERO -->
+             <section class="hero">
+                <div class="hero-bg">
+                    <img src="https://images.unsplash.com/photo-1526676037777-05a232554f77?w=1600&q=90" alt="Contact hero">
+                </div>
+                <div class="hero-overlay"></div>
+                <div class="hero-content">
+                    <span class="eyebrow">Get In Touch</span>
+                    <h1 class="page-title">Let's Talk<br>Race Day</h1>
+                    <p class="subtitle">Have questions about an upcoming event or want to hire us for your race? We're here to help.</p>
+                </div>
+            </section>
+
+            <!-- S2 CONTACT CARDS -->
+            <section>
+                <div class="container-rp">
+                    <div class="row g-4">
+                        <div class="col-md-4" data-aos="fade-up">
+                            <div class="glass-card">
+                                <div class="card-icon"><i class="fas fa-phone"></i></div>
+                                <h3>Phone</h3>
+                                <p>+91 98765 43210<br>Mon-Sat, 9am - 6pm</p>
+                            </div>
+                        </div>
+                        <div class="col-md-4" data-aos="fade-up" data-aos-delay="100">
+                            <div class="glass-card">
+                                <div class="card-icon"><i class="fas fa-envelope"></i></div>
+                                <h3>Email</h3>
+                                <p>hello@racepulse.com<br>support@racepulse.com</p>
+                            </div>
+                        </div>
+                        <div class="col-md-4" data-aos="fade-up" data-aos-delay="200">
+                            <div class="glass-card">
+                                <div class="card-icon"><i class="fas fa-map-marker-alt"></i></div>
+                                <h3>Location</h3>
+                                <p>T. Nagar, Chennai<br>Tamil Nadu, India</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- S3 CONTACT FORM -->
+            <section style="background: var(--bg-secondary);">
+                <div class="container-rp">
+                    <div class="section-header">
+                        <h2 class="section-title">Send a Message</h2>
+                        <div class="divider"></div>
+                    </div>
+                    <form class="contact-grid" id="contactForm">
+                        <div class="form-group">
+                            <label>Full Name</label>
+                            <input type="text" class="form-control-rp" placeholder="Your Name" required>
+                            <div class="error-msg">Please enter your name.</div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6 form-group">
+                                <label>Email Address</label>
+                                <input type="email" class="form-control-rp" placeholder="email@example.com" required>
+                                <div class="error-msg">Please enter a valid email.</div>
+                            </div>
+                            <div class="col-md-6 form-group">
+                                <label>Phone Number</label>
+                                <input type="tel" class="form-control-rp" placeholder="+91 00000 00000" required>
+                                <div class="error-msg">Please enter your phone number.</div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label>Event Type</label>
+                            <select class="form-control-rp">
+                                <option>5K / 10K Run</option>
+                                <option>Half Marathon</option>
+                                <option>Full Marathon</option>
+                                <option>Ultra Marathon</option>
+                                <option>Cycling / Triathlon</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Message</label>
+                            <textarea class="form-control-rp" rows="5" placeholder="Tell us about your event..." required></textarea>
+                            <div class="error-msg">Please enter your message.</div>
+                        </div>
+                        <button type="submit" class="btn-rp btn-primary" style="width: 100%;">Submit Request</button>
+                        <div id="formSuccess" style="display: none; color: var(--accent-teal); text-align: center; margin-top: 1rem;">Message sent successfully!</div>
+                    </form>
+                </div>
+            </section>
+
+            <!-- S4 MAP AREA -->
+            <section>
+                <div class="container-rp">
+                    <div style="height: 400px; background: #050810; border-radius: 20px; display: flex; align-items: center; justify-content: center; border: 1px solid var(--border);">
+                        <div class="text-center">
+                            <i class="fas fa-map-marked-alt" style="font-size: 3rem; color: var(--accent-teal); margin-bottom: 1rem;"></i>
+                            <h3>Chennai Office</h3>
+                            <p class="text-muted">Chennai, Tamil Nadu, India</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- S5 OFFICE HOURS -->
+            <section style="background: var(--bg-secondary);">
+                <div class="container-rp">
+                    <div class="section-header">
+                        <h2 class="section-title">Office Hours</h2>
+                        <div class="divider"></div>
+                    </div>
+                    <div style="max-width: 400px; margin: 0 auto;">
+                        <table class="table" style="color: var(--text-primary);">
+                            <tbody>
+                                <tr><td>Monday - Friday</td><td>9:00 AM - 6:00 PM</td></tr>
+                                <tr><td>Saturday</td><td>10:00 AM - 4:00 PM</td></tr>
+                                <tr><td>Sunday</td><td>Closed (Event Support Only)</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <!-- S6 SOCIAL LINKS -->
+            <section>
+                <div class="container-rp">
+                    <div class="section-header">
+                        <h2 class="section-title">Follow the Pulse</h2>
+                        <div class="divider"></div>
+                    </div>
+                    <div class="d-flex justify-content-center gap-4">
+                        <a href="#" class="social-icon" style="width: 60px; height: 60px; font-size: 1.5rem;"><i class="fab fa-facebook-f"></i></a>
+                        <a href="#" class="social-icon" style="width: 60px; height: 60px; font-size: 1.5rem;"><i class="fab fa-instagram"></i></a>
+                        <a href="#" class="social-icon" style="width: 60px; height: 60px; font-size: 1.5rem;"><i class="fab fa-twitter"></i></a>
+                        <a href="#" class="social-icon" style="width: 60px; height: 60px; font-size: 1.5rem;"><i class="fab fa-linkedin-in"></i></a>
+                    </div>
+                </div>
+            </section>
+
+            <!-- S7 FAQ -->
+            <section style="background: var(--bg-secondary);">
+                <div class="container-rp">
+                    <div class="section-header">
+                        <h2 class="section-title">Event Day Support</h2>
+                        <div class="divider"></div>
+                    </div>
+                    <div class="accordion accordion-flush" id="contactFaq" style="max-width: 800px; margin: 0 auto; text-align: left;">
+                         <div class="accordion-item bg-transparent" style="border-bottom: 1px solid var(--border);">
+                            <h2 class="accordion-header">
+                                <button class="accordion-button collapsed bg-transparent" type="button" data-bs-toggle="collapse" data-bs-target="#cf1" style="color: var(--text-primary);">
+                                    Do you provide support on race morning?
+                                </button>
+                            </h2>
+                            <div id="cf1" class="accordion-collapse collapse" data-bs-parent="#contactFaq">
+                                <div class="accordion-body text-secondary">
+                                    Yes, for Pro and Enterprise clients, our team is on-site 4 hours before the race start.
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- S8 FINAL CTA -->
+            <section>
+                <div class="container-rp">
+                    <h2 class="section-title">Let's Create History</h2>
+                    <p class="subtitle">Your runners deserve the best. We provide it.</p>
+                    <a onclick="showPage('home')" class="btn-rp btn-outline mt-4">Back to Home</a>
+                </div>
+            </section>
+        </div>
+
+    </main>
+
+    <!-- ── FOOTER ── -->
+    <footer>
+        <div class="container-rp">
+            <div class="footer-grid">
+                <div class="footer-col">
+                    <a href="#" class="logo mb-4 d-inline-flex" onclick="showPage('home')"><i class="fas fa-flag-checkered"></i> RACEPULSE</a>
+                    <p style="margin-top: 1rem;">Pioneering the future of race timing technology since 2018. Precision is our pulse.</p>
+                    <div class="social-row">
+                        <a href="#" class="social-icon"><i class="fab fa-facebook-f"></i></a>
+                        <a href="#" class="social-icon"><i class="fab fa-instagram"></i></a>
+                        <a href="#" class="social-icon"><i class="fab fa-twitter"></i></a>
+                        <a href="#" class="social-icon"><i class="fab fa-linkedin-in"></i></a>
+                        <a href="#" class="social-icon"><i class="fab fa-youtube"></i></a>
+                    </div>
+                </div>
+                <div class="footer-col">
+                    <h4>Quick Links</h4>
+                    <ul class="footer-links">
+                        <li><a onclick="showPage('home')">Home</a></li>
+                        <li><a onclick="showPage('about')">About Us</a></li>
+                        <li><a onclick="showPage('events')">Events</a></li>
+                        <li><a onclick="showPage('results')">Live Results</a></li>
+                        <li><a onclick="showPage('sponsors')">Sponsors</a></li>
+                        <li><a onclick="showPage('contact')">Contact</a></li>
+                    </ul>
+                </div>
+                <div class="footer-col">
+                    <h4>Services</h4>
+                    <ul class="footer-links">
+                        <li><a href="#">Chip Timing</a></li>
+                        <li><a href="#">Live Results Portal</a></li>
+                        <li><a href="#">Bib Management</a></li>
+                        <li><a href="#">Event Registration</a></li>
+                        <li><a href="#">Analytics</a></li>
+                    </ul>
+                </div>
+                <div class="footer-col">
+                    <h4>Contact</h4>
+                    <ul class="footer-links" style="color: var(--text-muted);">
+                        <li><i class="fas fa-phone me-2"></i> +91 98765 43210</li>
+                        <li><i class="fas fa-envelope me-2"></i> hello@racepulse.com</li>
+                        <li><i class="fas fa-map-marker-alt me-2"></i> T. Nagar, Chennai, India</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2026 RacePulse. All rights reserved.</p>
+                <p>Privacy Policy · Terms of Use</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- ── BACK TO TOP ── -->
+    <button id="backTop" title="Back to Top">
+        <i class="fas fa-arrow-up"></i>
+    </button>
+
+    <!-- ── SCRIPTS ── -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://unpkg.com/aos@2.3.4/dist/aos.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/particles.js@2.0.0/particles.min.js"></script>
+
+    <script>
+        /* ── 1. PAGE SWITCHER ── */
+        function showPage(pageId) {
+            const pages = document.querySelectorAll('.page');
+            const navLinks = document.querySelectorAll('.nav-link-item');
+            
+            pages.forEach(p => p.classList.remove('active'));
+            navLinks.forEach(l => l.classList.remove('active'));
+            
+            const targetPage = document.getElementById('page-' + pageId);
+            if (targetPage) {
+                targetPage.classList.add('active');
+                const activeNavLink = document.querySelector(`.nav-link-item[data-page="${pageId}"]`);
+                if (activeNavLink) activeNavLink.classList.add('active');
+                
+                window.scrollTo(0, 0);
+                document.title = "RacePulse · " + pageId.charAt(0).toUpperCase() + pageId.slice(1);
+                
+                // Re-init AOS for the new page
+                AOS.refresh();
+                
+                // If switching to home, ensure particles is active
+                if (pageId === 'home') {
+                    initParticles();
+                }
+            }
+        }
+
+        /* ── 2. THEME TOGGLE ── */
+        function toggleTheme() {
+            const html = document.documentElement;
+            const icon = document.getElementById('theme-icon');
+            const currentTheme = html.getAttribute('data-theme');
+            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+            
+            html.setAttribute('data-theme', newTheme);
+            localStorage.setItem('rp-theme', newTheme);
+            
+            if (newTheme === 'light') {
+                icon.classList.replace('fa-moon', 'fa-sun');
+            } else {
+                icon.classList.replace('fa-sun', 'fa-moon');
+            }
+        }
+
+        /* ── 3. RTL TOGGLE ── */
+        function toggleRTL() {
+            const html = document.documentElement;
+            const currentDir = html.getAttribute('dir');
+            const newDir = currentDir === 'ltr' ? 'rtl' : 'ltr';
+            html.setAttribute('dir', newDir);
+            localStorage.setItem('rp-dir', newDir);
+        }
+
+        /* ── 4. HAMBURGER MENU ── */
+        function toggleMobileMenu() {
+            const menu = document.getElementById('mobileMenu');
+            const toggle = document.getElementById('nav-toggle');
+            menu.classList.toggle('open');
+            toggle.classList.toggle('open');
+            document.body.style.overflow = menu.classList.contains('open') ? 'hidden' : 'auto';
+        }
+
+        /* ── 5. BACK TO TOP ── */
+        const backTopBtn = document.getElementById('backTop');
+        window.addEventListener('scroll', () => {
+            if (window.scrollY > 400) {
+                backTopBtn.classList.add('show');
+            } else {
+                backTopBtn.classList.remove('show');
+            }
+            
+            // Navbar scroll effect
+            const nav = document.getElementById('mainNav');
+            if (window.scrollY > 80) {
+                nav.classList.add('scrolled');
+            } else {
+                nav.classList.remove('scrolled');
+            }
+        });
+        backTopBtn.addEventListener('click', () => {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        });
+
+        /* ── 6. COUNTER ANIMATION ── */
+        function initCounters() {
+            const counters = document.querySelectorAll('.counter');
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        const target = +entry.target.getAttribute('data-target');
+                        const count = +entry.target.innerText;
+                        const increment = target / 100;
+                        
+                        const updateCount = () => {
+                            const current = +entry.target.innerText;
+                            if (current < target) {
+                                entry.target.innerText = Math.ceil(current + increment);
+                                setTimeout(updateCount, 20);
+                            } else {
+                                entry.target.innerText = target;
+                            }
+                        };
+                        updateCount();
+                        observer.unobserve(entry.target);
+                    }
+                });
+            }, { threshold: 0.5 });
+            
+            counters.forEach(c => observer.observe(c));
+        }
+
+        /* ── 7. PARTICLE CANVAS ── */
+        function initParticles() {
+            if (typeof particlesJS !== 'undefined' && document.getElementById('particles-js')) {
+                particlesJS('particles-js', {
+                    "particles": {
+                        "number": { "value": 50, "density": { "enable": true, "value_area": 800 } },
+                        "color": { "value": "#00E5C4" },
+                        "shape": { "type": "circle" },
+                        "opacity": { "value": 0.4, "random": false },
+                        "size": { "value": 3, "random": true },
+                        "line_linked": { "enable": true, "distance": 150, "color": "#00E5C4", "opacity": 0.2, "width": 1 },
+                        "move": { "enable": true, "speed": 1, "direction": "none", "random": false, "straight": false, "out_mode": "out", "bounce": false }
+                    },
+                    "interactivity": {
+                        "detect_on": "canvas",
+                        "events": { "onhover": { "enable": true, "mode": "grab" }, "onclick": { "enable": true, "mode": "push" }, "resize": true },
+                        "modes": { "grab": { "distance": 140, "line_linked": { "opacity": 1 } }, "push": { "particles_nb": 4 } }
+                    },
+                    "retina_detect": true
+                });
+            }
+        }
+
+        /* ── 8. AOS INIT ── */
+        AOS.init({ duration: 700, once: true, offset: 80 });
+
+        /* ── 9. FORM VALIDATION ── */
+        const contactForm = document.getElementById('contactForm');
+        if (contactForm) {
+            contactForm.addEventListener('submit', (e) => {
+                e.preventDefault();
+                let valid = true;
+                const inputs = contactForm.querySelectorAll('input[required], textarea[required]');
+                
+                inputs.forEach(input => {
+                    const error = input.nextElementSibling;
+                    if (!input.value.trim()) {
+                        if (error && error.classList.contains('error-msg')) error.style.display = 'block';
+                        valid = false;
+                    } else if (input.type === 'email' && !/\S+@\S+\.\S+/.test(input.value)) {
+                        if (error && error.classList.contains('error-msg')) error.style.display = 'block';
+                        valid = false;
+                    } else {
+                        if (error && error.classList.contains('error-msg')) error.style.display = 'none';
+                    }
+                });
+                
+                if (valid) {
+                    document.getElementById('formSuccess').style.display = 'block';
+                    contactForm.reset();
+                    setTimeout(() => { document.getElementById('formSuccess').style.display = 'none'; }, 5000);
+                }
+            });
+        }
+
+        /* ── ON LOAD ── */
+        window.addEventListener('DOMContentLoaded', () => {
+            // Theme check
+            const savedTheme = localStorage.getItem('rp-theme');
+            if (savedTheme) {
+                document.documentElement.setAttribute('data-theme', savedTheme);
+                const icon = document.getElementById('theme-icon');
+                if (savedTheme === 'light') icon.classList.replace('fa-moon', 'fa-sun');
+            }
+            
+            // Dir check
+            const savedDir = localStorage.getItem('rp-dir');
+            if (savedDir) document.documentElement.setAttribute('dir', savedDir);
+            
+            initParticles();
+            initCounters();
+        });
+    </script>
+</body>
+</html>
