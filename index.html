@@ -2840,7 +2840,7 @@
 
     <script>
         /* ── 1. PAGE SWITCHER ── */
-        function showPage(pageId) {
+        function showPage(pageId, updateHash = true) {
             const pages = document.querySelectorAll('.page');
             const navLinks = document.querySelectorAll('.nav-link-item');
             
@@ -2856,6 +2856,10 @@
                 window.scrollTo(0, 0);
                 document.title = "RacePulse · " + pageId.charAt(0).toUpperCase() + pageId.slice(1);
                 
+                if (updateHash) {
+                    window.location.hash = pageId;
+                }
+                
                 // Re-init AOS for the new page
                 AOS.refresh();
                 
@@ -2865,6 +2869,15 @@
                 }
             }
         }
+
+        // Handle routing based on hash
+        function handleRouting() {
+            const hash = window.location.hash.substring(1) || 'home';
+            showPage(hash, false);
+        }
+
+        window.addEventListener('hashchange', handleRouting);
+        window.addEventListener('load', handleRouting);
 
         /* ── 2. THEME TOGGLE ── */
         function toggleTheme() {
