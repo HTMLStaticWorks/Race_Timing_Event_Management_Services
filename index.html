@@ -234,6 +234,23 @@
         .control-btn:hover {
             color: var(--accent-teal);
         }
+        .control-btn.primary {
+            background: var(--accent-teal);
+            color: #080C1A;
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.1rem;
+            box-shadow: 0 4px 15px rgba(0, 229, 196, 0.3);
+        }
+        .control-btn.primary:hover {
+            transform: translateY(-2px);
+            filter: brightness(1.1);
+            color: #080C1A;
+        }
 
         /* ── HAMBURGER ── */
         .hamburger {
@@ -874,7 +891,7 @@
 
         /* ── RESPONSIVE ── */
         @media (max-width: 1023px) {
-            .nav-links, .nav-controls .btn-rp, .nav-controls .control-btn:not(.theme-toggle) {
+            .nav-links, .nav-controls .control-btn, .nav-controls .btn-rp {
                 display: none;
             }
             .hamburger { display: flex; }
@@ -936,13 +953,15 @@
             </ul>
 
             <div class="nav-controls">
-                <button class="control-btn" onclick="toggleTheme()" title="Toggle Theme">
+                <button class="control-btn theme-toggle" onclick="toggleTheme()" title="Toggle Theme">
                     <i class="fas fa-moon" id="theme-icon"></i>
                 </button>
                 <button class="control-btn" onclick="toggleRTL()" title="Toggle RTL">
                     <i class="fas fa-language"></i>
                 </button>
-                <a onclick="showPage('contact')" class="btn-rp btn-primary">Book Now</a>
+                <a onclick="showPage('contact')" class="control-btn primary" title="Book Now">
+                    <i class="fas fa-calendar-check"></i>
+                </a>
                 <button class="hamburger" id="nav-toggle" onclick="toggleMobileMenu()">
                     <span></span>
                     <span></span>
