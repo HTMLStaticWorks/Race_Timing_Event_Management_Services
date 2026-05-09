@@ -940,70 +940,379 @@
         }
 
         .tier-platinum {
-            grid-template-columns: repeat(2, 300px);
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            max-width: 1100px;
+            margin: 0 auto;
         }
 
         .tier-gold {
-            grid-template-columns: repeat(3, 240px);
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        .tier-tech {
+            display: grid;
+            gap: 1.5rem;
+            grid-template-columns: repeat(3, 1fr);
+            max-width: 1100px;
+            margin: 0 auto;
+        }
+
+        @media (max-width: 992px) {
+            .tier-tech {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 576px) {
+            .tier-tech {
+                grid-template-columns: 1fr;
+            }
         }
 
         .tier-silver {
-            grid-template-columns: repeat(4, 200px);
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            max-width: 1000px;
+            margin: 0 auto;
         }
 
         .tier-bronze {
-            grid-template-columns: repeat(5, 180px);
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            max-width: 1000px;
+            margin: 0 auto;
         }
 
         .sponsor-card {
-            background: var(--bg-card);
-            border: 1px solid var(--border);
-            border-radius: 12px;
-            padding: 2rem;
+            background: rgba(19, 27, 46, 0.4);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(0, 229, 196, 0.1);
+            border-radius: 24px;
+            padding: 2.5rem;
             display: flex;
             flex-direction: column;
             align-items: center;
-            transition: all 0.3s ease;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+            z-index: 1;
+        }
+
+        .sponsor-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: radial-gradient(circle at top right, rgba(0, 229, 196, 0.1), transparent 60%);
+            opacity: 0;
+            transition: opacity 0.5s ease;
+            z-index: -1;
         }
 
         .sponsor-card:hover {
             border-color: var(--accent-teal);
-            transform: scale(1.05);
+            transform: translateY(-12px) scale(1.02);
+            box-shadow: 0 30px 60px rgba(0, 0, 0, 0.5), 0 0 20px rgba(0, 229, 196, 0.15);
+        }
+
+        .sponsor-card:hover::before {
+            opacity: 1;
         }
 
         .sponsor-logo {
-            height: 120px;
+            height: 160px;
             width: 100%;
             display: flex;
             align-items: center;
             justify-content: center;
-            margin-bottom: 1.5rem;
-            overflow: hidden;
+            margin-bottom: 2rem;
+            position: relative;
+            border-radius: 20px;
             background: rgba(255, 255, 255, 0.03);
-            border-radius: 12px;
-            border: 1px solid var(--border);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            padding: 2rem;
+            overflow: hidden;
+            transition: all 0.5s ease;
+        }
+
+        .sponsor-card:hover .sponsor-logo {
+            background: rgba(255, 255, 255, 0.05);
+            border-color: rgba(0, 229, 196, 0.2);
+        }
+
+        /* Fallback icon if image fails */
+        .sponsor-logo::after {
+            content: '\f2b5'; /* fa-handshake */
+            font-family: 'Font Awesome 6 Free';
+            font-weight: 900;
+            font-size: 3rem;
+            color: var(--text-muted);
+            opacity: 0.1;
+            position: absolute;
+            z-index: 0;
         }
 
         .sponsor-logo img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            border-radius: 8px;
-            transition: transform 0.5s ease;
+            position: relative;
+            z-index: 1;
+            max-width: 90%;
+            max-height: 90%;
+            object-fit: contain;
+            filter: grayscale(1) brightness(1.2);
+            transition: all 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+            opacity: 0.7;
         }
 
         .sponsor-card:hover .sponsor-logo img {
-            transform: scale(1.1);
+            filter: grayscale(0) brightness(1);
+            transform: scale(1.15) rotate(-2deg);
+            opacity: 1;
         }
 
         .tier-badge {
-            font-size: 0.6rem;
-            padding: 2px 8px;
-            border-radius: 10px;
+            display: inline-block;
+            font-size: 0.75rem;
+            font-weight: 800;
             text-transform: uppercase;
-            letter-spacing: 1px;
-            margin-bottom: 0.5rem;
+            letter-spacing: 2px;
+            padding: 0.6rem 1.4rem;
+            border-radius: 100px;
+            margin-bottom: 1.8rem;
+            background: rgba(0, 229, 196, 0.08);
+            color: var(--accent-teal);
+            border: 1px solid rgba(0, 229, 196, 0.2);
+            backdrop-filter: blur(4px);
+            transition: all 0.4s ease;
         }
+
+        .sponsor-card:hover .tier-badge {
+            background: var(--accent-teal);
+            color: #080C1A;
+            transform: scale(1.05);
+            box-shadow: 0 0 20px rgba(0, 229, 196, 0.3);
+        }
+
+        .sponsor-card .card-title {
+            font-size: 1.6rem;
+            font-weight: 700;
+            margin-bottom: 1.2rem;
+            color: var(--text-primary);
+            font-family: var(--font-display);
+            letter-spacing: -0.02em;
+        }
+
+        .sponsor-link {
+            font-size: 0.95rem;
+            color: var(--accent-teal);
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.6rem;
+            transition: all 0.3s ease;
+            margin-top: auto;
+            font-weight: 600;
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            background: rgba(0, 229, 196, 0.05);
+        }
+
+        .sponsor-link i {
+            font-size: 0.85rem;
+            transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        .sponsor-card:hover .sponsor-link {
+            background: rgba(0, 229, 196, 0.15);
+            color: #FFFFFF;
+        }
+
+        .sponsor-card:hover .sponsor-link i {
+            transform: translate(4px, -4px);
+        }
+
+        /* ── GOLD CARD SPECIAL DESIGN ── */
+        .gold-card {
+            background: linear-gradient(145deg, rgba(15, 22, 40, 0.9), rgba(8, 12, 26, 0.95));
+            border: 1px solid rgba(245, 200, 66, 0.15);
+            border-radius: 20px;
+            padding: 1.5rem 2.5rem;
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            gap: 2rem;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .gold-card::after {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: conic-gradient(from 0deg, transparent, rgba(245, 200, 66, 0.1), transparent 30%);
+            animation: rotateGlow 6s linear infinite;
+            pointer-events: none;
+        }
+
+        @keyframes rotateGlow {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        .gold-card:hover {
+            transform: scale(1.03);
+            border-color: var(--accent-gold);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.4), 0 0 20px rgba(245, 200, 66, 0.2);
+        }
+
+        .gold-logo {
+            width: 80px;
+            height: 80px;
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(245, 200, 66, 0.05);
+            border-radius: 12px;
+            border: 1px solid rgba(245, 200, 66, 0.1);
+            padding: 10px;
+        }
+
+        .gold-logo img {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+            filter: grayscale(1) brightness(1.5);
+            transition: all 0.4s ease;
+        }
+
+        .gold-card:hover .gold-logo img {
+            filter: grayscale(0) brightness(1);
+            transform: scale(1.1);
+        }
+
+        .gold-info {
+            text-align: left;
+        }
+
+        .gold-info h3 {
+            font-size: 1.5rem;
+            margin: 0;
+            text-align: left;
+            color: var(--text-primary);
+        }
+
+        .gold-info .tier-label {
+            font-size: 0.65rem;
+            font-weight: 700;
+            color: var(--accent-gold);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            display: block;
+            margin-bottom: 4px;
+        }
+
+        @media (max-width: 768px) {
+            .gold-card {
+                flex-direction: column;
+                text-align: center;
+                padding: 2rem;
+            }
+            .gold-info h3 {
+                text-align: center;
+            }
+        }
+
+        /* ── TECHNICAL PARTNER CARD ── */
+        .technical-card {
+            background: rgba(15, 22, 40, 0.6);
+            border: 1px solid rgba(0, 229, 196, 0.1);
+            border-radius: 16px;
+            padding: 2rem;
+            text-align: center;
+            transition: all 0.4s ease;
+            position: relative;
+            overflow: hidden;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .technical-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(rgba(0, 229, 196, 0.03) 1px, transparent 1px),
+                        linear-gradient(90deg, rgba(0, 229, 196, 0.03) 1px, transparent 1px);
+            background-size: 20px 20px;
+            opacity: 0;
+            transition: opacity 0.4s ease;
+        }
+
+        .technical-card:hover {
+            transform: translateY(-5px);
+            border-color: rgba(0, 229, 196, 0.3);
+            background: rgba(15, 22, 40, 0.8);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        }
+
+        .technical-card:hover::before {
+            opacity: 1;
+        }
+
+        .tech-logo {
+            height: 60px;
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            z-index: 1;
+        }
+
+        .tech-logo img {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+            filter: grayscale(1) invert(0.5) brightness(1.5);
+            transition: all 0.4s ease;
+        }
+
+        .technical-card:hover .tech-logo {
+            transform: scale(1.1) rotate(3deg);
+        }
+
+        .technical-card:hover .tech-logo img {
+            filter: grayscale(0) invert(0) brightness(1);
+        }
+
+        .technical-card h3 {
+            font-family: var(--font-mono);
+            font-size: 1.1rem;
+            font-weight: 700;
+            margin: 0;
+            color: var(--text-secondary);
+            transition: color 0.4s ease;
+            z-index: 1;
+        }
+
+        .technical-card:hover h3 {
+            color: var(--accent-teal);
+        }
+
+        /* ── SILVER TIER (Simple) ── */
 
         /* ── CONTACT ── */
         .contact-grid {
@@ -2978,56 +3287,64 @@
                         <div class="divider"></div>
                     </div>
                     <div class="sponsor-grid tier-platinum">
-                        <div class="sponsor-card" data-aos="zoom-in">
-                            <div class="sponsor-logo"><img src="assets/sponsors/marathon_hero_1_1778223092921.png"
-                                    alt="Nike">
+                        <!-- Nike -->
+                        <div class="sponsor-card" data-aos="fade-up">
+                            <div class="sponsor-logo">
+                                <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/a/a6/Logo_NIKE.svg/600px-Logo_NIKE.svg.png" alt="Nike">
                             </div>
-                            <span class="tier-badge"
-                                style="background: var(--accent-teal); color: #080C1A;">Platinum</span>
+                            <span class="tier-badge">Platinum</span>
                             <h3 class="card-title">Nike India</h3>
-                            <a href="#" class="text-teal">Visit Website</a>
+                            <a href="#" class="sponsor-link">Visit Website <i class="fas fa-external-link-alt"></i></a>
                         </div>
-                        <div class="sponsor-card" data-aos="zoom-in" data-aos-delay="100">
-                            <div class="sponsor-logo"><img src="assets/sponsors/race_tech_rfid_1778223115216.png"
-                                    alt="Adidas"></div>
-                            <span class="tier-badge"
-                                style="background: var(--accent-teal); color: #080C1A;">Platinum</span>
+
+                        <!-- Adidas -->
+                        <div class="sponsor-card" data-aos="fade-up" data-aos-delay="100">
+                            <div class="sponsor-logo">
+                                <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/2/20/Adidas_Logo.svg/600px-Adidas_Logo.svg.png" alt="Adidas">
+                            </div>
+                            <span class="tier-badge">Platinum</span>
                             <h3 class="card-title">Adidas Performance</h3>
-                            <a href="#" class="text-teal">Visit Website</a>
+                            <a href="#" class="sponsor-link">Visit Website <i class="fas fa-external-link-alt"></i></a>
                         </div>
-                        <div class="sponsor-card" data-aos="zoom-in" data-aos-delay="200">
-                            <div class="sponsor-logo"><img src="assets/sponsors/stadium_finish_line_1778223131063.png"
-                                    alt="Puma">
+
+                        <!-- Puma -->
+                        <div class="sponsor-card" data-aos="fade-up" data-aos-delay="200">
+                            <div class="sponsor-logo">
+                                <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/8/88/Puma-Logo.png/600px-Puma-Logo.png" alt="Puma">
                             </div>
-                            <span class="tier-badge"
-                                style="background: var(--accent-teal); color: #080C1A;">Platinum</span>
+                            <span class="tier-badge">Platinum</span>
                             <h3 class="card-title">Puma Motorsport</h3>
-                            <a href="#" class="text-teal">Visit Website</a>
+                            <a href="#" class="sponsor-link">Visit Website <i class="fas fa-external-link-alt"></i></a>
                         </div>
-                        <div class="sponsor-card" data-aos="zoom-in" data-aos-delay="300">
-                            <div class="sponsor-logo"><img src="assets/sponsors/marathon_crowd_aerial_1778223146995.png"
-                                    alt="Under Armour"></div>
-                            <span class="tier-badge"
-                                style="background: var(--accent-teal); color: #080C1A;">Platinum</span>
-                            <h3 class="card-title">Under Armour</h3>
-                            <a href="#" class="text-teal">Visit Website</a>
-                        </div>
-                        <div class="sponsor-card" data-aos="zoom-in" data-aos-delay="400">
-                            <div class="sponsor-logo"><img
-                                    src="assets/sponsors/futuristic_race_data_viz_1778223205860.png" alt="Reebok"></div>
-                            <span class="tier-badge"
-                                style="background: var(--accent-teal); color: #080C1A;">Platinum</span>
-                            <h3 class="card-title">Reebok Fitness</h3>
-                            <a href="#" class="text-teal">Visit Website</a>
-                        </div>
-                        <div class="sponsor-card" data-aos="zoom-in" data-aos-delay="500">
-                            <div class="sponsor-logo"><img
-                                    src="assets/sponsors/cinematic_marathon_close_up_1778223224382.png" alt="Decathlon">
+
+                        <!-- Under Armour -->
+                        <div class="sponsor-card" data-aos="fade-up" data-aos-delay="300">
+                            <div class="sponsor-logo">
+                                <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/4/44/Under_Armour_logo.svg/600px-Under_Armour_logo.svg.png" alt="Under Armour">
                             </div>
-                            <span class="tier-badge"
-                                style="background: var(--accent-teal); color: #080C1A;">Platinum</span>
+                            <span class="tier-badge">Platinum</span>
+                            <h3 class="card-title">Under Armour</h3>
+                            <a href="#" class="sponsor-link">Visit Website <i class="fas fa-external-link-alt"></i></a>
+                        </div>
+
+                        <!-- Reebok -->
+                        <div class="sponsor-card" data-aos="fade-up" data-aos-delay="400">
+                            <div class="sponsor-logo">
+                                <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/5/53/Reebok_2019_logo.svg/600px-Reebok_2019_logo.svg.png" alt="Reebok">
+                            </div>
+                            <span class="tier-badge">Platinum</span>
+                            <h3 class="card-title">Reebok Fitness</h3>
+                            <a href="#" class="sponsor-link">Visit Website <i class="fas fa-external-link-alt"></i></a>
+                        </div>
+
+                        <!-- Decathlon -->
+                        <div class="sponsor-card" data-aos="fade-up" data-aos-delay="500">
+                            <div class="sponsor-logo">
+                                <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/a/ab/Logo_Decathlon.svg/600px-Logo_Decathlon.svg.png" alt="Decathlon">
+                            </div>
+                            <span class="tier-badge">Platinum</span>
                             <h3 class="card-title">Decathlon Sports</h3>
-                            <a href="#" class="text-teal">Visit Website</a>
+                            <a href="#" class="sponsor-link">Visit Website <i class="fas fa-external-link-alt"></i></a>
                         </div>
                     </div>
                 </div>
@@ -3042,21 +3359,37 @@
                         <div class="divider"></div>
                     </div>
                     <div class="sponsor-grid tier-gold">
-                        <div class="sponsor-card" data-aos="fade-up">
-                            <div class="sponsor-logo"><img
-                                    src="assets/sponsors/holographic_leaderboard_stadium_1778223241583.png"
-                                    alt="Red Bull"></div>
-                            <h3 class="card-title">Red Bull</h3>
+                        <!-- Red Bull -->
+                        <div class="gold-card" data-aos="fade-up">
+                            <div class="gold-logo">
+                                <img src="https://upload.wikimedia.org/wikipedia/en/thumb/f/f5/Red_Bull_Racing_logo.svg/600px-Red_Bull_Racing_logo.svg.png" alt="Red Bull">
+                            </div>
+                            <div class="gold-info">
+                                <span class="tier-label">Official Sponsor</span>
+                                <h3>Red Bull</h3>
+                            </div>
                         </div>
-                        <div class="sponsor-card" data-aos="fade-up" data-aos-delay="100">
-                            <div class="sponsor-logo"><img
-                                    src="assets/sponsors/professional_timing_team_1778223287575.png" alt="Garmin"></div>
-                            <h3 class="card-title">Garmin</h3>
+
+                        <!-- Garmin -->
+                        <div class="gold-card" data-aos="fade-up" data-aos-delay="100">
+                            <div class="gold-logo">
+                                <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/b/b7/Garmin_logo.svg/600px-Garmin_logo.svg.png" alt="Garmin">
+                            </div>
+                            <div class="gold-info">
+                                <span class="tier-label">Official Sponsor</span>
+                                <h3>Garmin</h3>
+                            </div>
                         </div>
-                        <div class="sponsor-card" data-aos="fade-up" data-aos-delay="200">
-                            <div class="sponsor-logo"><img src="assets/sponsors/rfid_antenna_setup_1778223302271.png"
-                                    alt="Apple"></div>
-                            <h3 class="card-title">Apple Watch</h3>
+
+                        <!-- Apple Watch -->
+                        <div class="gold-card" data-aos="fade-up" data-aos-delay="200">
+                            <div class="gold-logo">
+                                <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/f/fa/Apple_logo_black.svg/400px-Apple_logo_black.svg.png" alt="Apple Watch">
+                            </div>
+                            <div class="gold-info">
+                                <span class="tier-label">Official Sponsor</span>
+                                <h3>Apple Watch</h3>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -3095,61 +3428,77 @@
                         <h2 class="section-title">Technical Support Network</h2>
                         <div class="divider"></div>
                     </div>
-                    <div class="sponsor-grid tier-gold">
-                        <!-- 9 cards in 3 columns using tier-gold class which is repeat(3, 240px) -->
-                        <div class="sponsor-card" data-aos="zoom-in">
-                            <div class="sponsor-logo"><img
-                                    src="https://images.unsplash.com/photo-1510017803434-a899398421b3?w=600&q=85"
-                                    alt="Polar"></div>
-                            <h3 class="card-title">Polar</h3>
+                    <div class="tier-tech">
+                        <!-- Polar -->
+                        <div class="technical-card" data-aos="fade-up">
+                            <div class="tech-logo">
+                                <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/1/1a/Polar_logo.svg/600px-Polar_logo.svg.png" alt="Polar">
+                            </div>
+                            <h3>Polar</h3>
                         </div>
-                        <div class="sponsor-card" data-aos="zoom-in" data-aos-delay="100">
-                            <div class="sponsor-logo"><img
-                                    src="https://images.unsplash.com/photo-1523170335258-f5ed11844a49?w=600&q=85"
-                                    alt="Suunto"></div>
-                            <h3 class="card-title">Suunto</h3>
+
+                        <!-- Suunto -->
+                        <div class="technical-card" data-aos="fade-up" data-aos-delay="50">
+                            <div class="tech-logo">
+                                <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/8/81/Suunto_logo.svg/600px-Suunto_logo.svg.png" alt="Suunto">
+                            </div>
+                            <h3>Suunto</h3>
                         </div>
-                        <div class="sponsor-card" data-aos="zoom-in" data-aos-delay="200">
-                            <div class="sponsor-logo"><img
-                                    src="https://images.unsplash.com/photo-1476480862126-209bfaa8edc8?w=600&q=85"
-                                    alt="Strava"></div>
-                            <h3 class="card-title">Strava</h3>
+
+                        <!-- Strava -->
+                        <div class="technical-card" data-aos="fade-up" data-aos-delay="100">
+                            <div class="tech-logo">
+                                <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/c/cb/Strava_Logo.svg/600px-Strava_Logo.svg.png" alt="Strava">
+                            </div>
+                            <h3>Strava</h3>
                         </div>
-                        <div class="sponsor-card" data-aos="zoom-in">
-                            <div class="sponsor-logo"><img
-                                    src="https://images.unsplash.com/photo-1511499767150-a48a237f0083?w=600&q=85"
-                                    alt="Oakley"></div>
-                            <h3 class="card-title">Oakley</h3>
+
+                        <!-- Oakley -->
+                        <div class="technical-card" data-aos="fade-up" data-aos-delay="150">
+                            <div class="tech-logo">
+                                <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/c/cb/Oakley_logo.svg/600px-Oakley_logo.svg.png" alt="Oakley">
+                            </div>
+                            <h3>Oakley</h3>
                         </div>
-                        <div class="sponsor-card" data-aos="zoom-in" data-aos-delay="100">
-                            <div class="sponsor-logo"><img
-                                    src="https://images.unsplash.com/photo-1595950653106-6c9ebd614d3a?w=600&q=85"
-                                    alt="Brooks"></div>
-                            <h3 class="card-title">Brooks</h3>
+
+                        <!-- Brooks -->
+                        <div class="technical-card" data-aos="fade-up" data-aos-delay="200">
+                            <div class="tech-logo">
+                                <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/5/53/Brooks_Sports_Logo.svg/600px-Brooks_Sports_Logo.svg.png" alt="Brooks">
+                            </div>
+                            <h3>Brooks</h3>
                         </div>
-                        <div class="sponsor-card" data-aos="zoom-in" data-aos-delay="200">
-                            <div class="sponsor-logo"><img
-                                    src="https://images.unsplash.com/photo-1539185441755-769473a23570?w=600&q=85"
-                                    alt="New Balance"></div>
-                            <h3 class="card-title">New Balance</h3>
+
+                        <!-- New Balance -->
+                        <div class="technical-card" data-aos="fade-up" data-aos-delay="250">
+                            <div class="tech-logo">
+                                <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/a/a2/New_Balance_logo.svg/600px-New_Balance_logo.svg.png" alt="New Balance">
+                            </div>
+                            <h3>New Balance</h3>
                         </div>
-                        <div class="sponsor-card" data-aos="zoom-in">
-                            <div class="sponsor-logo"><img
-                                    src="https://images.unsplash.com/photo-1560769629-975ec94e6a86?w=600&q=85"
-                                    alt="Hoka"></div>
-                            <h3 class="card-title">Hoka</h3>
+
+                        <!-- Hoka -->
+                        <div class="technical-card" data-aos="fade-up" data-aos-delay="300">
+                            <div class="tech-logo">
+                                <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/a/a2/Hoka_One_One_logo.svg/400px-Hoka_One_One_logo.svg.png" alt="Hoka">
+                            </div>
+                            <h3>Hoka</h3>
                         </div>
-                        <div class="sponsor-card" data-aos="zoom-in" data-aos-delay="100">
-                            <div class="sponsor-logo"><img
-                                    src="https://images.unsplash.com/photo-1562183241-b937e95585b6?w=600&q=85"
-                                    alt="Saucony"></div>
-                            <h3 class="card-title">Saucony</h3>
+
+                        <!-- Saucony -->
+                        <div class="technical-card" data-aos="fade-up" data-aos-delay="350">
+                            <div class="tech-logo">
+                                <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/6/60/Saucony_logo.svg/600px-Saucony_logo.svg.png" alt="Saucony">
+                            </div>
+                            <h3>Saucony</h3>
                         </div>
-                        <div class="sponsor-card" data-aos="zoom-in" data-aos-delay="200">
-                            <div class="sponsor-logo"><img
-                                    src="https://images.unsplash.com/photo-1516478177764-9fe5bd7e9717?w=600&q=85"
-                                    alt="ASICS"></div>
-                            <h3 class="card-title">ASICS</h3>
+
+                        <!-- ASICS -->
+                        <div class="technical-card" data-aos="fade-up" data-aos-delay="400">
+                            <div class="tech-logo">
+                                <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/b/b1/Asics_logo.svg/600px-Asics_logo.svg.png" alt="ASICS">
+                            </div>
+                            <h3>ASICS</h3>
                         </div>
                     </div>
                 </div>
