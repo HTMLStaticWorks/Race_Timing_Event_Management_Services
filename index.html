@@ -36,6 +36,7 @@
             --text-muted: #5A6A82;
             --border: rgba(255, 107, 0, 0.12);
             --glow-orange: 0 0 30px rgba(255, 107, 0, 0.20);
+            --map-invert: 0.9;
 
             --font-display: 'Orbitron', sans-serif;
             --font-body: 'DM Sans', sans-serif;
@@ -53,6 +54,7 @@
             --text-muted: #7A8A9A;
             --border: rgba(8, 12, 26, 0.10);
             --glow-orange: 0 0 20px rgba(255, 107, 0, 0.10);
+            --map-invert: 0;
         }
 
         /* ── GLOBAL RESET ── */
@@ -133,6 +135,12 @@
             max-width: 580px;
             margin: 0 auto;
             font-size: 1.1rem;
+        }
+
+        .img-wrap img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
         }
 
         .timing-font {
@@ -352,7 +360,7 @@
         .mobile-menu-overlay {
             position: fixed;
             inset: 0;
-            background: rgba(8, 12, 26, 0.99);
+            background: var(--bg-primary); /* Use theme variable */
             backdrop-filter: blur(30px);
             z-index: 10000;
             display: flex;
@@ -361,7 +369,17 @@
             justify-content: center;
             opacity: 0;
             visibility: hidden;
-            transition: all 0.4s ease;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            overflow-y: auto; /* Allow scrolling if list is long */
+            padding: 80px 20px;
+        }
+
+        [data-theme="dark"] .mobile-menu-overlay {
+            background: rgba(8, 12, 26, 0.98);
+        }
+
+        [data-theme="light"] .mobile-menu-overlay {
+            background: rgba(255, 255, 255, 0.98);
         }
 
         .mobile-menu-overlay.open {
@@ -372,16 +390,23 @@
         .mobile-links {
             display: flex;
             flex-direction: column;
-            gap: 2rem;
+            gap: 1.25rem; /* Slightly tighter gap for better fit */
             text-align: center;
+            width: 100%;
         }
 
         .mobile-links a {
             font-family: var(--font-display);
-            font-size: 1.4rem;
+            font-size: 1.25rem;
             color: var(--text-primary);
             text-decoration: none;
-            padding: 1rem;
+            padding: 0.8rem;
+            display: block;
+            transition: color 0.3s ease;
+        }
+
+        .mobile-links a:hover {
+            color: var(--accent-orange);
         }
 
         .mobile-controls {
@@ -524,8 +549,8 @@
         .glass-card {
             background: var(--bg-card);
             border: 1px solid var(--border);
-            border-radius: 16px;
-            padding: 0;
+            border-radius: 20px;
+            padding: 2.5rem;
             text-align: center;
             transition: transform 0.35s ease, border-color 0.35s ease, box-shadow 0.35s ease;
             display: flex;
@@ -533,6 +558,7 @@
             align-items: center;
             height: 100%;
             overflow: hidden;
+            position: relative;
         }
 
         .card-img-top {
@@ -616,6 +642,22 @@
             margin-bottom: 0.5rem;
         }
 
+        .nav-link-item.active {
+            color: var(--accent-orange) !important;
+            opacity: 1;
+        }
+
+        .nav-link-item.active::after {
+            width: 100%;
+        }
+
+        /* ── MOBILE ACTIVE ── */
+        .mobile-links .nav-link-item.active {
+            color: var(--accent-orange) !important;
+            transform: scale(1.1);
+            font-weight: 800;
+        }
+
         .team-card p {
             color: var(--accent-orange) !important;
             /* Force visibility over .text-muted */
@@ -693,7 +735,7 @@
             font-size: 1.1rem;
             color: var(--accent-orange);
             margin: 0;
-            text-align: left;
+            text-align: center;
         }
 
         .author-info p {
@@ -703,6 +745,7 @@
             font-style: normal;
             text-transform: uppercase;
             letter-spacing: 1px;
+            text-align: center;
         }
 
         .star-rating {
@@ -1372,6 +1415,20 @@
             margin-bottom: 4px;
         }
 
+        [data-theme="light"] .gold-info .tier-label {
+            color: #B28900; /* Darker Gold for visibility on white */
+        }
+
+        [data-theme="light"] .tier-badge {
+            background: rgba(255, 107, 0, 0.12);
+            color: #CC5600; /* Darker orange for visibility on white */
+        }
+
+        [data-theme="light"] .sponsor-link {
+            color: #CC5600;
+            background: rgba(255, 107, 0, 0.08);
+        }
+
         @media (max-width: 768px) {
             .gold-card {
                 flex-direction: column;
@@ -1408,21 +1465,21 @@
             width: 100%;
             height: 100%;
             object-fit: cover;
-            opacity: 0.4;
+            opacity: 0.7;
             transition: transform 0.8s ease, opacity 0.4s ease;
-            filter: grayscale(0.2) brightness(0.7);
+            filter: grayscale(0.1) brightness(0.9);
         }
 
         .technical-card:hover .card-bg-img {
-            opacity: 0.6;
+            opacity: 0.9;
             transform: scale(1.1);
-            filter: grayscale(0) brightness(0.8);
+            filter: grayscale(0) brightness(1);
         }
 
         .card-overlay {
             position: absolute;
             inset: 0;
-            background: linear-gradient(to top, rgba(8, 12, 26, 0.95) 0%, rgba(8, 12, 26, 0.2) 100%);
+            background: linear-gradient(to top, rgba(8, 12, 26, 0.8) 0%, rgba(8, 12, 26, 0.1) 100%);
             z-index: 1;
         }
 
@@ -1445,9 +1502,153 @@
             text-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
         }
 
+        /* ── LIGHT MODE SPONSOR ADJUSTMENTS ── */
+        [data-theme="light"] .tier-badge {
+            background: rgba(255, 107, 0, 0.15);
+            color: #D35400; /* Darker orange for contrast */
+            border-color: rgba(255, 107, 0, 0.3);
+        }
+
+        [data-theme="light"] .sponsor-link {
+            color: #D35400;
+            background: rgba(211, 84, 0, 0.08);
+        }
+
+        [data-theme="light"] .sponsor-link:hover {
+            background: #D35400;
+            color: #FFFFFF !important;
+        }
+
+        [data-theme="light"] .gold-info .tier-label {
+            color: #B7950B; /* Darker gold for white background */
+            font-weight: 800;
+        }
+
+        [data-theme="light"] .sponsor-card {
+            background: #FFFFFF;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+        }
+
+        /* ── ACCORDION CUSTOM ── */
+        .accordion-button::after {
+            filter: invert(var(--theme-invert, 0));
+        }
+
+        [data-theme="dark"] {
+            --theme-invert: 1;
+        }
+
+        .accordion-button:not(.collapsed) {
+            background-color: rgba(255, 107, 0, 0.1);
+            color: var(--accent-orange);
+            box-shadow: none;
+        }
+
+        .accordion-button:focus {
+            box-shadow: none;
+            border-color: var(--accent-orange);
+        }
+
+        .accordion-item {
+            background-color: transparent !important;
+            border-color: var(--border) !important;
+        }
+
         .technical-card:hover h3 {
             transform: translateY(-5px);
-            letter-spacing: 5px;
+        }
+
+        /* ── PULSE MARKERS ── */
+        .pulse-marker {
+            position: absolute;
+            z-index: 10;
+        }
+
+        .pulse-marker .dot {
+            width: 14px;
+            height: 14px;
+            background: var(--accent-orange);
+            border-radius: 50%;
+            position: relative;
+            box-shadow: 0 0 15px var(--accent-orange);
+        }
+
+        .pulse-marker .dot::after {
+            content: '';
+            position: absolute;
+            inset: -4px;
+            border-radius: 50%;
+            border: 2px solid var(--accent-orange);
+            animation: pulse-ring 2s infinite;
+        }
+
+        @keyframes pulse-ring {
+            0% { transform: scale(0.5); opacity: 0; }
+            50% { opacity: 0.5; }
+            100% { transform: scale(1.5); opacity: 0; }
+        }
+
+        .pulse-marker .label {
+            position: absolute;
+            top: 50%;
+            left: 20px;
+            transform: translateY(-50%);
+            background: rgba(8, 12, 26, 0.9);
+            color: #FFFFFF;
+            padding: 4px 12px;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            font-family: var(--font-display);
+            font-weight: 700;
+            white-space: nowrap;
+            border: 1px solid rgba(255, 107, 0, 0.3);
+            backdrop-filter: blur(5px);
+        }
+
+        /* ── EVENT CARDS ENHANCED ── */
+        .past-event-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            overflow: hidden;
+            transition: all 0.4s ease;
+            height: 100%;
+        }
+
+        .past-event-card:hover {
+            transform: translateY(-10px);
+            border-color: var(--accent-orange);
+            box-shadow: var(--glow-orange);
+        }
+
+        .past-event-card .card-img {
+            height: 180px;
+            position: relative;
+        }
+
+        .past-event-card .card-img img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            filter: grayscale(0.5);
+            transition: all 0.5s ease;
+        }
+
+        .past-event-card:hover .card-img img {
+            filter: grayscale(0);
+        }
+
+        .past-event-badge {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            background: #28a745;
+            color: white;
+            font-size: 0.65rem;
+            padding: 4px 10px;
+            border-radius: 4px;
+            font-weight: 700;
+            text-transform: uppercase;
         }
 
         /* ── SILVER TIER (Simple) ── */
@@ -1768,15 +1969,14 @@
     <!-- ── MOBILE MENU ── -->
     <div class="mobile-menu-overlay" id="mobileMenu">
         <div class="mobile-links">
-            <a onclick="showPage('home'); toggleMobileMenu()">HOME</a>
-            <a onclick="showPage('home2'); toggleMobileMenu()">HOME 2</a>
-            <a onclick="showPage('about'); toggleMobileMenu()">ABOUT</a>
-            <a onclick="showPage('services'); toggleMobileMenu()">SERVICES</a>
-            <a onclick="showPage('events'); toggleMobileMenu()">EVENTS</a>
+            <a onclick="showPage('home'); toggleMobileMenu()" class="nav-link-item" data-page="home">HOME</a>
+            <a onclick="showPage('home2'); toggleMobileMenu()" class="nav-link-item" data-page="home2">HOME 2</a>
+            <a onclick="showPage('about'); toggleMobileMenu()" class="nav-link-item" data-page="about">ABOUT</a>
+            <a onclick="showPage('services'); toggleMobileMenu()" class="nav-link-item" data-page="services">SERVICES</a>
+            <a onclick="showPage('events'); toggleMobileMenu()" class="nav-link-item" data-page="events">EVENTS</a>
 
-            <a onclick="showPage('sponsors'); toggleMobileMenu()">SPONSORS</a>
-            <a onclick="showPage('dashboard'); toggleMobileMenu()">DASHBOARD</a>
-            <a onclick="showPage('contact'); toggleMobileMenu()">CONTACT</a>
+            <a onclick="showPage('sponsors'); toggleMobileMenu()" class="nav-link-item" data-page="sponsors">SPONSORS</a>
+            <a onclick="showPage('contact'); toggleMobileMenu()" class="nav-link-item" data-page="contact">CONTACT</a>
 
         </div>
         <div class="mobile-controls">
@@ -1974,14 +2174,7 @@
             <section style="background: var(--bg-primary);">
                 <div class="container-rp">
                     <div class="row align-items-center g-5">
-                        <div class="col-lg-6 order-lg-2" data-aos="fade-left">
-                            <div class="img-wrap"
-                                style="height: 500px; border-radius: 20px; overflow: hidden; box-shadow: var(--glow-orange);">
-                                <img src="https://images.livemint.com/img/2022/04/27/original/ATHLETICS-MARATHON-VIENNA-0_1651085755593.JPG"
-                                    alt="Capturing Excellence" style="width: 100%; height: 100%; object-fit: cover;">
-                            </div>
-                        </div>
-                        <div class="col-lg-6 order-lg-1 text-start" data-aos="fade-right">
+                        <div class="col-lg-6 order-1" data-aos="fade-right">
                             <span class="eyebrow">Our Philosophy</span>
                             <h2 class="section-title" style="text-align: left;">Capturing Excellence</h2>
                             <div class="divider" style="margin-left: 0;"></div>
@@ -1993,6 +2186,13 @@
                                 provide times; we provide memories. Our platform integrates live photography and instant
                                 certificates to celebrate every finisher's achievement.</p>
                             <a onclick="showPage('about')" class="btn-rp btn-primary mt-4">Read Our Full Story</a>
+                        </div>
+                        <div class="col-lg-6 order-2" data-aos="fade-left">
+                            <div class="img-wrap"
+                                style="height: 500px; border-radius: 20px; overflow: hidden; box-shadow: var(--glow-orange);">
+                                <img src="https://images.livemint.com/img/2022/04/27/original/ATHLETICS-MARATHON-VIENNA-0_1651085755593.JPG"
+                                    alt="Capturing Excellence" style="width: 100%; height: 100%; object-fit: cover;">
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -2106,20 +2306,30 @@
                                 <a href="#" class="btn-rp btn-primary">Register Now</a>
                             </div>
                         </div>
-
+                        <div class="event-card" data-aos="fade-up" data-aos-delay="200">
+                            <div class="event-img">
+                                <img src="https://images.unsplash.com/photo-1461897104016-0b3b00cc81ee?w=600&q=85"
+                                    alt="Event">
+                                <span class="event-date">AUG 28, 2026</span>
+                            </div>
+                            <div class="event-body">
+                                <h3 class="card-title">Highland Ultra</h3>
+                                <p class="event-meta">Ooty, India | 50K Trail Run</p>
+                                <a href="#" class="btn-rp btn-primary">Register Now</a>
+                            </div>
+                        </div>
                     </div>
                 </div>
-        </div>
-        </section>
+            </section>
 
 
 
         <!-- S8 FINAL CTA -->
-        <section style="background: radial-gradient(circle at center, #131B2E 0%, #080C1A 100%);">
+        <section style="background: radial-gradient(circle at center, var(--bg-card) 0%, var(--bg-primary) 100%);">
             <div class="container-rp" data-aos="zoom-in">
-                <h2 class="hero-title" style="font-size: clamp(2rem, 5vw, 3.5rem); color: #FFFFFF !important;">Ready to Time Your Next
+                <h2 class="hero-title" style="font-size: clamp(2rem, 5vw, 3.5rem);">Ready to Time Your Next
                     Masterpiece?</h2>
-                <p class="subtitle" style="margin: 2rem auto; color: rgba(255,255,255,0.8) !important;">Join the Pulse network and experience the peak of
+                <p class="subtitle" style="margin: 2rem auto;">Join the Pulse network and experience the peak of
                     event technology.</p>
                 <div class="btn-group-center">
                     <a onclick="showPage('contact')" class="btn-rp btn-primary">Request a Quote</a>
@@ -2158,7 +2368,7 @@
                         <div class="divider"></div>
                     </div>
                     <div class="row g-5 justify-content-center">
-                        <div class="col-md-3" data-aos="fade-up">
+                        <div class="col-lg-3 col-md-6" data-aos="fade-up">
                             <div class="glass-card">
                                 <div class="card-img-top">
                                     <img src="https://images.pexels.com/photos/3902733/pexels-photo-3902733.jpeg"
@@ -2171,7 +2381,7 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="col-md-3" data-aos="fade-up" data-aos-delay="50">
+                        <div class="col-lg-3 col-md-6" data-aos="fade-up" data-aos-delay="50">
                             <div class="glass-card">
                                 <div class="card-img-top">
                                     <img src="https://images.pexels.com/photos/35686432/pexels-photo-35686432.jpeg"
@@ -2184,7 +2394,7 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="col-md-3" data-aos="fade-up" data-aos-delay="100">
+                        <div class="col-lg-3 col-md-6" data-aos="fade-up" data-aos-delay="100">
                             <div class="glass-card">
                                 <div class="card-img-top">
                                     <img src="https://images.pexels.com/photos/34068199/pexels-photo-34068199.jpeg"
@@ -2197,7 +2407,7 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="col-md-3" data-aos="fade-up" data-aos-delay="150">
+                        <div class="col-lg-3 col-md-6" data-aos="fade-up" data-aos-delay="150">
                             <div class="glass-card">
                                 <div class="card-img-top">
                                     <img src="https://images.pexels.com/photos/5956083/pexels-photo-5956083.jpeg"
@@ -2262,8 +2472,8 @@
                         <div class="divider"></div>
                     </div>
                     <div class="row g-5 justify-content-center">
-                        <div class="col-md-4" data-aos="fade-up">
-                            <div class="testimonial-card">
+                        <div class="col-lg-4 col-md-6" data-aos="fade-up">
+                            <div class="testimonial-card text-center">
                                 <i class="fas fa-quote-right quote-icon"></i>
                                 <div class="star-rating">
                                     <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i
@@ -2271,7 +2481,7 @@
                                 </div>
                                 <p>"Pulse transformed our city marathon. The live tracking was a game changer for
                                     spectators."</p>
-                                <div class="testimonial-author">
+                                <div class="testimonial-author" style="justify-content: center;">
                                     <div class="author-info">
                                         <h3>Vikram Seth</h3>
                                         <p>Mumbai Marathon Director</p>
@@ -2279,8 +2489,8 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="col-md-4" data-aos="fade-up" data-aos-delay="100">
-                            <div class="testimonial-card">
+                        <div class="col-lg-4 col-md-6" data-aos="fade-up" data-aos-delay="100">
+                            <div class="testimonial-card text-center">
                                 <i class="fas fa-quote-right quote-icon"></i>
                                 <div class="star-rating">
                                     <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i
@@ -2288,7 +2498,7 @@
                                 </div>
                                 <p>"Flawless execution. We had zero timing issues even with 10,000 runners crossing the
                                     line."</p>
-                                <div class="testimonial-author">
+                                <div class="testimonial-author" style="justify-content: center;">
                                     <div class="author-info">
                                         <h3>Sarah J.</h3>
                                         <p>Coastal 10K Organizer</p>
@@ -2296,8 +2506,8 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="col-md-4" data-aos="fade-up" data-aos-delay="200">
-                            <div class="testimonial-card">
+                        <div class="col-lg-4 col-md-6" data-aos="fade-up" data-aos-delay="200">
+                            <div class="testimonial-card text-center">
                                 <i class="fas fa-quote-right quote-icon"></i>
                                 <div class="star-rating">
                                     <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i
@@ -2305,7 +2515,7 @@
                                 </div>
                                 <p>"The most reliable timing partner we've ever worked with. And Highly recommended."
                                 </p>
-                                <div class="testimonial-author">
+                                <div class="testimonial-author" style="justify-content: center;">
                                     <div class="author-info">
                                         <h3>Mark Evans</h3>
                                         <p>Elite Trail Races</p>
@@ -2337,7 +2547,7 @@
                         <div class="divider"></div>
                     </div>
                     <div class="row g-5 justify-content-center">
-                        <div class="col-md-3" data-aos="fade-up">
+                        <div class="col-lg-3 col-md-6" data-aos="fade-up">
                             <div class="glass-card">
                                 <div class="card-img-top">
                                     <img src="https://images.unsplash.com/photo-1524666041070-9d87656c25bb?w=600&q=80"
@@ -2352,7 +2562,7 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="col-md-3" data-aos="fade-up" data-aos-delay="100">
+                        <div class="col-lg-3 col-md-6" data-aos="fade-up" data-aos-delay="100">
                             <div class="glass-card">
                                 <div class="card-img-top">
                                     <img src="https://images.unsplash.com/photo-1571008887538-b36bb32f4571?w=600&q=80"
@@ -2367,7 +2577,7 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="col-md-3" data-aos="fade-up" data-aos-delay="200">
+                        <div class="col-lg-3 col-md-6" data-aos="fade-up" data-aos-delay="200">
                             <div class="glass-card">
                                 <div class="card-img-top">
                                     <img src="https://images.unsplash.com/photo-1461896836934-ffe607ba8211?w=600&q=80"
@@ -2382,7 +2592,7 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="col-md-3" data-aos="fade-up" data-aos-delay="300">
+                        <div class="col-lg-3 col-md-6" data-aos="fade-up" data-aos-delay="300">
                             <div class="glass-card">
                                 <div class="card-img-top">
                                     <img src="https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=600&q=80"
@@ -2449,27 +2659,25 @@
             <!-- S2 MISSION -->
             <section>
                 <div class="container-rp">
-                    <div class="row align-items-center g-5">
-                        <div class="col-lg-6 d-flex align-items-center justify-content-center" data-aos="fade-right">
-                            <div class="img-wrap"
-                                style="height: auto; max-width: 100%; display: flex; justify-content: center; align-items: center;">
-                                <img src="https://images.livemint.com/img/2022/04/27/original/ATHLETICS-MARATHON-VIENNA-0_1651085755593.JPG"
-                                    alt="Mission"
-                                    style="max-width: 100%; border-radius: 12px; box-shadow: 0 15px 35px rgba(0,0,0,0.2);">
+                    <div class="row justify-content-center">
+                        <div class="col-lg-8" data-aos="fade-up">
+                            <div class="text-center mb-5">
+                                <div class="img-wrap mx-auto"
+                                    style="max-width: 700px; border-radius: 20px; overflow: hidden; box-shadow: 0 20px 40px rgba(0,0,0,0.3);">
+                                    <img src="https://images.unsplash.com/photo-1461897104016-0b3b00cc81ee?w=1000&q=85"
+                                        alt="Heritage" style="width: 100%; transition: transform 0.5s ease;">
+                                </div>
                             </div>
-                        </div>
-                        <div class="col-lg-6" data-aos="fade-left">
-                            <div class="text-start" style="text-align: left !important;">
-                                <span class="eyebrow" style="text-align: left;">Our Mission</span>
-                                <h2 class="section-title" style="text-align: left;">Capturing Excellence</h2>
-                                <div class="divider" style="margin-left: 0;"></div>
-                                <p class="text-secondary">At Pulse, we believe that every participant deserves a
-                                    professional experience. Whether it's a small local club run or a major
-                                    international marathon, our goal is to provide the same level of elite technology
-                                    and support.</p>
-                                <p class="text-secondary mt-3">We don't just provide times; we provide memories. Our
-                                    platform integrates live photography and instant certificates to celebrate every
-                                    finisher's achievement.</p>
+                            <div class="text-center">
+                                <span class="eyebrow">Our Heritage</span>
+                                <h2 class="section-title">Heritage of Precision</h2>
+                                <div class="divider mx-auto"></div>
+                                <p class="subtitle" style="margin-bottom: 1.5rem;">Since our inception, Pulse has been committed to setting the
+                                    gold standard in race timing. We understand that behind every bib number is a story
+                                    of dedication and hard work.</p>
+                                <p class="subtitle">Our journey started with a simple goal: to provide
+                                    runners with the most accurate data possible. Today, we've scaled that vision into
+                                    an elite technological ecosystem that supports events worldwide.</p>
                             </div>
                         </div>
                     </div>
@@ -2489,7 +2697,7 @@
                         <div class="team-card" data-aos="fade-up">
                             <div class="img-wrap"
                                 style="aspect-ratio: 1/1; border-radius: 50%; width: 120px; margin: 0 auto 1.5rem;">
-                                <img src="https://i.pravatar.cc/150?u=1" alt="Team member">
+                                <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop" alt="Rahul Dev">
                             </div>
                             <h3>Rahul Dev</h3>
                             <p class="text-muted small">CEO & Founder</p>
@@ -2497,7 +2705,7 @@
                         <div class="team-card" data-aos="fade-up" data-aos-delay="50">
                             <div class="img-wrap"
                                 style="aspect-ratio: 1/1; border-radius: 50%; width: 120px; margin: 0 auto 1.5rem;">
-                                <img src="https://i.pravatar.cc/150?u=2" alt="Team member">
+                                <img src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=150&h=150&fit=crop" alt="Ananya Iyer">
                             </div>
                             <h3>Ananya Iyer</h3>
                             <p class="text-muted small">CTO</p>
@@ -2505,7 +2713,7 @@
                         <div class="team-card" data-aos="fade-up" data-aos-delay="100">
                             <div class="img-wrap"
                                 style="aspect-ratio: 1/1; border-radius: 50%; width: 120px; margin: 0 auto 1.5rem;">
-                                <img src="https://i.pravatar.cc/150?u=3" alt="Team member">
+                                <img src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=150&h=150&fit=crop" alt="Siddharth M">
                             </div>
                             <h3>Siddharth M.</h3>
                             <p class="text-muted small">Lead Engineer</p>
@@ -2513,7 +2721,7 @@
                         <div class="team-card" data-aos="fade-up" data-aos-delay="150">
                             <div class="img-wrap"
                                 style="aspect-ratio: 1/1; border-radius: 50%; width: 120px; margin: 0 auto 1.5rem;">
-                                <img src="https://i.pravatar.cc/150?u=4" alt="Team member">
+                                <img src="https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=150&h=150&fit=crop" alt="Meera K">
                             </div>
                             <h3>Meera K.</h3>
                             <p class="text-muted small">Operations</p>
@@ -2521,7 +2729,7 @@
                         <div class="team-card" data-aos="fade-up" data-aos-delay="200">
                             <div class="img-wrap"
                                 style="aspect-ratio: 1/1; border-radius: 50%; width: 120px; margin: 0 auto 1.5rem;">
-                                <img src="https://i.pravatar.cc/150?u=5" alt="Team member">
+                                <img src="https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?w=150&h=150&fit=crop" alt="Chris Evans">
                             </div>
                             <h3>Chris Evans</h3>
                             <p class="text-muted small">Event Director</p>
@@ -2530,7 +2738,7 @@
                         <div class="team-card" data-aos="fade-up">
                             <div class="img-wrap"
                                 style="aspect-ratio: 1/1; border-radius: 50%; width: 120px; margin: 0 auto 1.5rem;">
-                                <img src="https://i.pravatar.cc/150?u=6" alt="Team member">
+                                <img src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=150&h=150&fit=crop" alt="Priya Singh">
                             </div>
                             <h3>Priya Singh</h3>
                             <p class="text-muted small">DevOps</p>
@@ -2538,16 +2746,15 @@
                         <div class="team-card" data-aos="fade-up" data-aos-delay="50">
                             <div class="img-wrap"
                                 style="aspect-ratio: 1/1; border-radius: 50%; width: 120px; margin: 0 auto 1.5rem;">
-                                <img src="https://i.pravatar.cc/150?u=7" alt="Team member">
+                                <img src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop" alt="David R">
                             </div>
                             <h3>David R.</h3>
                             <p class="text-muted small">Hardware Specialist</p>
                         </div>
-
-                        <div class="team-card" data-aos="fade-up" data-aos-delay="200">
+                        <div class="team-card" data-aos="fade-up" data-aos-delay="100">
                             <div class="img-wrap"
                                 style="aspect-ratio: 1/1; border-radius: 50%; width: 120px; margin: 0 auto 1.5rem;">
-                                <img src="https://i.pravatar.cc/150?u=10" alt="Team member">
+                                <img src="https://images.unsplash.com/photo-1580489944761-15a19d654956?w=150&h=150&fit=crop" alt="Lisa W">
                             </div>
                             <h3>Lisa W.</h3>
                             <p class="text-muted small">Logistics</p>
@@ -2703,65 +2910,65 @@
                             destinations.</p>
                     </div>
                     <div class="row g-5 justify-content-center">
-                        <div class="col-lg-4" data-aos="fade-up">
+                        <div class="col-lg-4 col-md-6" data-aos="fade-up">
                             <div class="img-card"
-                                style="height: 450px; border-radius: 24px; background: url('assets/cities/mumbai.png') center/cover no-repeat;">
+                                style="height: clamp(350px, 50vh, 450px); border-radius: 24px; background: url('assets/cities/mumbai.png') center/cover no-repeat;">
                                 <div class="img-card-overlay"
-                                    style="opacity: 1; background: linear-gradient(to top, rgba(8,12,26,0.95) 0%, rgba(8,12,26,0.1) 100%); padding: 2rem;">
-                                    <div style="text-align: left; margin-top: auto;">
+                                    style="opacity: 1; background: linear-gradient(to top, rgba(8,12,26,0.95) 0%, rgba(8,12,26,0.1) 100%); padding: 2rem; display: flex; flex-direction: column; justify-content: center; align-items: center;">
+                                    <div style="text-align: center; margin-top: auto;">
                                         <h3
-                                            style="color: var(--accent-orange); font-size: 2rem; font-family: var(--font-display);">
+                                            style="color: var(--accent-orange); font-size: 2rem; font-family: var(--font-display); text-align: center;">
                                             Mumbai</h3>
                                         <p
-                                            style="color: #E0E7FF; font-size: 0.9rem; letter-spacing: 1px; text-transform: uppercase;">
+                                            style="color: #E0E7FF; font-size: 0.9rem; letter-spacing: 1px; text-transform: uppercase; text-align: center;">
                                             The Financial Capital</p>
                                         <div
-                                            style="height: 2px; width: 40px; background: var(--accent-orange); margin: 1rem 0;">
+                                            style="height: 2px; width: 40px; background: var(--accent-orange); margin: 1rem auto;">
                                         </div>
-                                        <p style="color: #A8B8D0; font-size: 0.85rem;">Home to the continent's most
+                                        <p style="color: #A8B8D0; font-size: 0.85rem; text-align: center;">Home to the continent's most
                                             prestigious marathons and high-density sea-link runs.</p>
                                     </div>
                                 </div>
                             </div>
                         </div>
-                        <div class="col-lg-4" data-aos="fade-up" data-aos-delay="100">
+                        <div class="col-lg-4 col-md-6" data-aos="fade-up" data-aos-delay="100">
                             <div class="img-card"
-                                style="height: 450px; border-radius: 24px; background: url('assets/cities/bangalore.png') center/cover no-repeat;">
+                                style="height: clamp(350px, 50vh, 450px); border-radius: 24px; background: url('assets/cities/bangalore.png') center/cover no-repeat;">
                                 <div class="img-card-overlay"
-                                    style="opacity: 1; background: linear-gradient(to top, rgba(8,12,26,0.95) 0%, rgba(8,12,26,0.1) 100%); padding: 2rem;">
-                                    <div style="text-align: left; margin-top: auto;">
+                                    style="opacity: 1; background: linear-gradient(to top, rgba(8,12,26,0.95) 0%, rgba(8,12,26,0.1) 100%); padding: 2rem; display: flex; flex-direction: column; justify-content: center; align-items: center;">
+                                    <div style="text-align: center; margin-top: auto;">
                                         <h3
-                                            style="color: var(--accent-orange); font-size: 2rem; font-family: var(--font-display);">
+                                            style="color: var(--accent-orange); font-size: 2rem; font-family: var(--font-display); text-align: center;">
                                             Bangalore</h3>
                                         <p
-                                            style="color: #E0E7FF; font-size: 0.9rem; letter-spacing: 1px; text-transform: uppercase;">
+                                            style="color: #E0E7FF; font-size: 0.9rem; letter-spacing: 1px; text-transform: uppercase; text-align: center;">
                                             The Garden City</p>
                                         <div
-                                            style="height: 2px; width: 40px; background: var(--accent-orange); margin: 1rem 0;">
+                                            style="height: 2px; width: 40px; background: var(--accent-orange); margin: 1rem auto;">
                                         </div>
-                                        <p style="color: #A8B8D0; font-size: 0.85rem;">Revolutionizing tech-driven runs
+                                        <p style="color: #A8B8D0; font-size: 0.85rem; text-align: center;">Revolutionizing tech-driven runs
                                             through Cubbon Park and elite city circuits.</p>
                                     </div>
                                 </div>
                             </div>
                         </div>
-                        <div class="col-lg-4" data-aos="fade-up" data-aos-delay="200">
-                            <div class="img-card" style="height: 450px; border-radius: 24px;">
+                        <div class="col-lg-4 col-md-6" data-aos="fade-up" data-aos-delay="200">
+                            <div class="img-card" style="height: clamp(350px, 50vh, 450px); border-radius: 24px;">
                                 <img src="https://images.unsplash.com/photo-1582510003544-4d00b7f74220?w=800&q=85"
                                     alt="Chennai">
                                 <div class="img-card-overlay"
-                                    style="opacity: 1; background: linear-gradient(to top, rgba(8,12,26,0.95) 0%, rgba(8,12,26,0.1) 100%); padding: 2rem;">
-                                    <div style="text-align: left; margin-top: auto;">
+                                    style="opacity: 1; background: linear-gradient(to top, rgba(8,12,26,0.95) 0%, rgba(8,12,26,0.1) 100%); padding: 2rem; display: flex; flex-direction: column; justify-content: center; align-items: center;">
+                                    <div style="text-align: center; margin-top: auto;">
                                         <h3
-                                            style="color: var(--accent-orange); font-size: 2rem; font-family: var(--font-display);">
+                                            style="color: var(--accent-orange); font-size: 2rem; font-family: var(--font-display); text-align: center;">
                                             Chennai</h3>
                                         <p
-                                            style="color: #E0E7FF; font-size: 0.9rem; letter-spacing: 1px; text-transform: uppercase;">
+                                            style="color: #E0E7FF; font-size: 0.9rem; letter-spacing: 1px; text-transform: uppercase; text-align: center;">
                                             The Gateway to South</p>
                                         <div
-                                            style="height: 2px; width: 40px; background: var(--accent-orange); margin: 1rem 0;">
+                                            style="height: 2px; width: 40px; background: var(--accent-orange); margin: 1rem auto;">
                                         </div>
-                                        <p style="color: #A8B8D0; font-size: 0.85rem;">Mastering the humidity and
+                                        <p style="color: #A8B8D0; font-size: 0.85rem; text-align: center;">Mastering the humidity and
                                             massive participation at the iconic Marina beach fronts.</p>
                                     </div>
                                 </div>
@@ -3093,7 +3300,7 @@
                                     <li><i class="fas fa-check-circle me-2 text-orange"></i> Finish Line Timing</li>
                                     <li><i class="fas fa-check-circle me-2 text-orange"></i> Basic Results Page</li>
                                 </ul>
-                                <a href="#" class="btn-rp btn-outline w-100 mt-4">Choose Starter</a>
+                                <a href="#" class="btn-rp btn-primary w-100 mt-4">Choose Starter</a>
                             </div>
                         </div>
 
@@ -3112,7 +3319,7 @@
                                     <li><i class="fas fa-check-circle me-2 text-orange"></i> SMS & Email Alerts</li>
                                     <li><i class="fas fa-check-circle me-2 text-orange"></i> Live Leaderboards</li>
                                 </ul>
-                                <a href="#" class="btn-rp btn-primary w-100 mt-4" style="padding: 18px;">Choose Pro</a>
+                                <a href="#" class="btn-rp btn-primary w-100 mt-4">Choose Pro</a>
                             </div>
                         </div>
 
@@ -3130,7 +3337,7 @@
                                     <li><i class="fas fa-check-circle me-2 text-orange"></i> Full On-Site Support</li>
                                     <li><i class="fas fa-check-circle me-2 text-orange"></i> White-label Portal</li>
                                 </ul>
-                                <a onclick="showPage('contact')" class="btn-rp btn-outline w-100 mt-4">Contact Sales</a>
+                                <a onclick="showPage('contact')" class="btn-rp btn-primary w-100 mt-4">Contact Sales</a>
                             </div>
                         </div>
                     </div>
@@ -3243,10 +3450,10 @@
             </section>
 
             <!-- S8 CONTACT CTA -->
-            <section style="background: radial-gradient(circle at center, #131B2E 0%, #080C1A 100%);">
+            <section style="background: radial-gradient(circle at center, var(--bg-card) 0%, var(--bg-primary) 100%);">
                 <div class="container-rp">
-                    <h2 class="section-title" style="color: white;">Need a Custom Solution?</h2>
-                    <p class="subtitle" style="color: white;">Our experts are ready to design a timing plan specific to
+                    <h2 class="section-title">Need a Custom Solution?</h2>
+                    <p class="subtitle">Our experts are ready to design a timing plan specific to
                         your event needs.</p>
                     <a onclick="showPage('contact')" class="btn-rp btn-primary" style="margin-top: 2rem;">Message Us</a>
                 </div>
@@ -3443,26 +3650,44 @@
                         <h2 class="section-title">Past Events</h2>
                         <div class="divider"></div>
                     </div>
-                    <div class="row g-5 justify-content-center">
-                        <div class="col-md-4" data-aos="fade-up">
-                            <div class="glass-card">
-                                <h3>Spring Run 2026</h3>
-                                <p>1,200 Runners | Completed</p>
-
+                    <div class="row g-4 justify-content-center">
+                        <div class="col-lg-4 col-md-6" data-aos="fade-up">
+                            <div class="past-event-card">
+                                <div class="card-img">
+                                    <img src="https://images.unsplash.com/photo-1532444458054-01a7dd3e9fca?w=600&q=85" alt="Spring Run">
+                                    <span class="past-event-badge">Completed</span>
+                                </div>
+                                <div class="p-4 text-start">
+                                    <h3 style="text-align: left; font-size: 1.25rem; margin-bottom: 0.5rem;">Spring Run 2026</h3>
+                                    <p class="small text-muted"><i class="fas fa-users me-2"></i> 1,200 Runners Tracked</p>
+                                    <p class="small text-muted"><i class="fas fa-map-marker-alt me-2"></i> Mumbai Sea Link</p>
+                                </div>
                             </div>
                         </div>
-                        <div class="col-md-4" data-aos="fade-up" data-aos-delay="100">
-                            <div class="glass-card">
-                                <h3>Night Glow 5K</h3>
-                                <p>850 Runners | Completed</p>
-
+                        <div class="col-lg-4 col-md-6" data-aos="fade-up" data-aos-delay="100">
+                            <div class="past-event-card">
+                                <div class="card-img">
+                                    <img src="https://images.unsplash.com/photo-1547483734-ccd1f6b57174?w=600&q=85" alt="Night Glow">
+                                    <span class="past-event-badge">Completed</span>
+                                </div>
+                                <div class="p-4 text-start">
+                                    <h3 style="text-align: left; font-size: 1.25rem; margin-bottom: 0.5rem;">Night Glow 5K</h3>
+                                    <p class="small text-muted"><i class="fas fa-users me-2"></i> 850 Runners Tracked</p>
+                                    <p class="small text-muted"><i class="fas fa-map-marker-alt me-2"></i> Bangalore IT Park</p>
+                                </div>
                             </div>
                         </div>
-                        <div class="col-md-4" data-aos="fade-up" data-aos-delay="200">
-                            <div class="glass-card">
-                                <h3>Hill Climb 2025</h3>
-                                <p>500 Runners | Completed</p>
-
+                        <div class="col-lg-4 col-md-6" data-aos="fade-up" data-aos-delay="200">
+                            <div class="past-event-card">
+                                <div class="card-img">
+                                    <img src="https://images.unsplash.com/photo-1467307983825-619715426c70?w=600&q=85" alt="Hill Climb">
+                                    <span class="past-event-badge">Completed</span>
+                                </div>
+                                <div class="p-4 text-start">
+                                    <h3 style="text-align: left; font-size: 1.25rem; margin-bottom: 0.5rem;">Hill Climb 2025</h3>
+                                    <p class="small text-muted"><i class="fas fa-users me-2"></i> 500 Runners Tracked</p>
+                                    <p class="small text-muted"><i class="fas fa-map-marker-alt me-2"></i> Ooty Western Ghats</p>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -3504,10 +3729,10 @@
             </section>
 
             <!-- S8 NEWSLETTER -->
-            <section style="background: radial-gradient(circle at center, #131B2E 0%, #080C1A 100%);">
+            <section style="background: radial-gradient(circle at center, var(--bg-card) 0%, var(--bg-primary) 100%);">
                 <div class="container-rp">
-                    <h2 class="section-title" style="color: #FFFFFF !important;">Stay Updated</h2>
-                    <p class="subtitle" style="color: rgba(255,255,255,0.8) !important;">Get the latest race announcements delivered to your inbox.
+                    <h2 class="section-title">Stay Updated</h2>
+                    <p class="subtitle">Get the latest race announcements delivered to your inbox.
                     </p>
                     <form class="mt-4" style="max-width: 500px; margin: 0 auto; display: flex; gap: 1rem;">
                         <input type="email" class="form-control-rp" placeholder="Email Address" required>
@@ -3744,7 +3969,7 @@
 
                         <!-- Saucony -->
                         <div class="technical-card" data-aos="fade-up" data-aos-delay="350">
-                            <img src="https://images.unsplash.com/photo-1512374382149-4332c6c021f1?auto=format&fit=crop&q=80&w=800"
+                            <img src="https://images.unsplash.com/photo-1595950653106-6c9ebd614d3a?auto=format&fit=crop&q=80&w=800"
                                 class="card-bg-img" alt="Saucony">
                             <div class="card-overlay"></div>
                             <h3>Saucony</h3>
@@ -3824,6 +4049,7 @@
                             <div class="glass-card">
                                 <span class="eyebrow" style="color: var(--accent-orange);">PACKAGE 1</span>
                                 <h3>Title Sponsor</h3>
+                                <h3 class="timing-font">Custom</h3>
                                 <p>Exclusive brand placement across all event materials and results portal.</p>
                                 <a href="#" class="btn-rp btn-primary mt-3">Enquire</a>
                             </div>
@@ -3977,13 +4203,11 @@
             <!-- S4 MAP AREA -->
             <section>
                 <div class="container-rp">
-                    <div
-                        style="height: 400px; background: #050810; border-radius: 20px; display: flex; align-items: center; justify-content: center; border: 1px solid var(--border);">
-                        <div class="text-center">
-                            <i class="fas fa-map-marked-alt"
-                                style="font-size: 3rem; color: var(--accent-orange); margin-bottom: 1rem;"></i>
-                            <h3>Chennai Office</h3>
-                            <p class="text-muted">Chennai, Tamil Nadu, India</p>
+                    <div class="row g-0" style="border-radius: 24px; overflow: hidden; border: 1px solid var(--border); box-shadow: 0 20px 50px rgba(0,0,0,0.3);">
+                        <div class="col-lg-12">
+                            <iframe 
+                                src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3886.974465487661!2d80.2312!3d13.0418!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3a52665977fb0c9d%3A0xc3f8f17e082855f4!2sT.%20Nagar%2C%20Chennai%2C%20Tamil%20Nadu!5e0!3m2!1sen!2sin!4v1715682856789!5m2!1sen!2sin" 
+                                width="100%" height="450" style="border:0; filter: grayscale(0.5) contrast(1.2) invert(var(--map-invert, 0));" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
                         </div>
                     </div>
                 </div>
@@ -4292,16 +4516,18 @@
         /* ── 1. PAGE SWITCHER ── */
         function showPage(pageId, updateHash = true) {
             const pages = document.querySelectorAll('.page');
-            const navLinks = document.querySelectorAll('.nav-link-item');
+            const allNavLinks = document.querySelectorAll('.nav-link-item');
 
             pages.forEach(p => p.classList.remove('active'));
-            navLinks.forEach(l => l.classList.remove('active'));
+            allNavLinks.forEach(l => l.classList.remove('active'));
 
             const targetPage = document.getElementById('page-' + pageId);
             if (targetPage) {
                 targetPage.classList.add('active');
-                const activeNavLink = document.querySelector(`.nav-link-item[data-page="${pageId}"]`);
-                if (activeNavLink) activeNavLink.classList.add('active');
+                
+                // Highlight ALL links pointing to this page (Desktop, Mobile, etc)
+                const matchingLinks = document.querySelectorAll(`.nav-link-item[data-page="${pageId}"]`);
+                matchingLinks.forEach(link => link.classList.add('active'));
 
                 window.scrollTo(0, 0);
                 document.title = "Pulse · " + pageId.charAt(0).toUpperCase() + pageId.slice(1);

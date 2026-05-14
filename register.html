@@ -357,25 +357,31 @@
             <form action="#">
                 <div class="form-group">
                     <label class="form-label">Full Name</label>
-                    <input type="text" class="form-control-rp" placeholder="John Doe" required>
+                    <input type="text" class="form-control-rp" required>
                 </div>
 
                 <div class="form-group">
                     <label class="form-label">Email Address</label>
-                    <input type="email" class="form-control-rp" placeholder="name@example.com" required>
+                    <input type="email" class="form-control-rp" required>
                 </div>
 
                 <div class="form-group">
                     <label class="form-label">Password</label>
-                    <input type="password" id="reg-password" class="form-control-rp" placeholder="••••••••" required>
+                    <input type="password" id="reg-password" class="form-control-rp" required>
                     <i class="fas fa-eye password-toggle" onclick="togglePassword('reg-password')"></i>
                 </div>
 
                 <div class="form-group">
                     <label class="form-label">Confirm Password</label>
-                    <input type="password" id="confirm-password" class="form-control-rp" placeholder="••••••••"
+                    <input type="password" id="confirm-password" class="form-control-rp"
                         required>
                     <i class="fas fa-eye password-toggle" onclick="togglePassword('confirm-password')"></i>
+                </div>
+
+                <div class="form-group" style="margin-bottom: 2rem;">
+                    <label class="remember-me" style="font-size: 0.9rem; justify-content: flex-start;">
+                        <input type="checkbox" required> I agree to the <a href="#" style="color: var(--accent-orange); text-decoration: none; font-weight: 600; margin-left: 5px;">Terms of Service</a>
+                    </label>
                 </div>
 
                 <button type="submit" class="btn-auth">Create Account</button>
@@ -394,9 +400,7 @@
                 </a>
             </div>
 
-            <div class="terms-text">
-                I agree to our <a href="#">Terms of Service</a>.
-            </div>
+
 
             <div class="auth-footer">
                 Already have an account? <a href="login.html">Sign In</a>
