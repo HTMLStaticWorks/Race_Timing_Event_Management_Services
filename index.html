@@ -1710,8 +1710,39 @@
 
         /* ── OFFICIAL SPONSOR tier-label light mode fix ── */
         [data-theme="light"] .tier-label {
-            color: #B05A00 !important;
+            color: #FFFFFF !important;
             font-weight: 800;
+        }
+
+        /* ── PAST EVENTS dark mode text contrast fix ── */
+        [data-theme="dark"] .past-event-card .text-muted {
+            color: #A8B8D0 !important;
+        }
+
+        /* ── TIMING FEATURES row alignment ── */
+        .timing-feature-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.85rem 0;
+            border-bottom: 1px solid var(--border);
+            gap: 1rem;
+        }
+        .timing-feature-row:last-child {
+            border-bottom: none;
+        }
+        .timing-feature-row .tf-label {
+            color: var(--text-muted);
+            font-size: 0.82rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            white-space: nowrap;
+            flex-shrink: 0;
+        }
+        .timing-feature-row .tf-value {
+            font-weight: 700;
+            text-align: right;
+            flex-shrink: 0;
         }
 
         /* ── SILVER TIER (Simple) ── */
@@ -3225,7 +3256,7 @@
                                 </div>
                                 <div style="padding:1.5rem;">
                                     <div class="card-icon"
-                                        style="width:44px;height:44px;font-size:1rem;margin:0 0 1rem 0;"><i
+                                        style="width:44px;height:44px;font-size:1rem;margin:0 auto 1rem auto;"><i
                                             class="fas fa-stopwatch"></i></div>
                                     <h3 style="color:var(--accent-orange);font-size:1.2rem;margin-bottom:0.5rem;">
                                         Marathon Timing</h3>
@@ -3244,7 +3275,7 @@
                                 </div>
                                 <div style="padding:1.5rem;">
                                     <div class="card-icon"
-                                        style="width:44px;height:44px;font-size:1rem;margin:0 0 1rem 0;"><i
+                                        style="width:44px;height:44px;font-size:1rem;margin:0 auto 1rem auto;"><i
                                             class="fas fa-broadcast-tower"></i></div>
                                     <h3 style="color:var(--accent-orange);font-size:1.2rem;margin-bottom:0.5rem;">Live
                                         Portal</h3>
@@ -3263,7 +3294,7 @@
                                 </div>
                                 <div style="padding:1.5rem;">
                                     <div class="card-icon"
-                                        style="width:44px;height:44px;font-size:1rem;margin:0 0 1rem 0;"><i
+                                        style="width:44px;height:44px;font-size:1rem;margin:0 auto 1rem auto;"><i
                                             class="fas fa-id-badge"></i></div>
                                     <h3 style="color:var(--accent-orange);font-size:1.2rem;margin-bottom:0.5rem;">Bib
                                         &amp; Chip</h3>
@@ -3282,7 +3313,7 @@
                                 </div>
                                 <div style="padding:1.5rem;">
                                     <div class="card-icon"
-                                        style="width:44px;height:44px;font-size:1rem;margin:0 0 1rem 0;"><i
+                                        style="width:44px;height:44px;font-size:1rem;margin:0 auto 1rem auto;"><i
                                             class="fas fa-users"></i></div>
                                     <h3 style="color:var(--accent-orange);font-size:1.2rem;margin-bottom:0.5rem;">
                                         Volunteer Coordination</h3>
@@ -3300,7 +3331,7 @@
                                 </div>
                                 <div style="padding:1.5rem;">
                                     <div class="card-icon"
-                                        style="width:44px;height:44px;font-size:1rem;margin:0 0 1rem 0;"><i
+                                        style="width:44px;height:44px;font-size:1rem;margin:0 auto 1rem auto;"><i
                                             class="fas fa-tag"></i></div>
                                     <h3 style="color:var(--accent-orange);font-size:1.2rem;margin-bottom:0.5rem;">
                                         Sponsor Showcase</h3>
@@ -3318,7 +3349,7 @@
                                 </div>
                                 <div style="padding:1.5rem;">
                                     <div class="card-icon"
-                                        style="width:44px;height:44px;font-size:1rem;margin:0 0 1rem 0;"><i
+                                        style="width:44px;height:44px;font-size:1rem;margin:0 auto 1rem auto;"><i
                                             class="fas fa-clipboard-list"></i></div>
                                     <h3 style="color:var(--accent-orange);font-size:1.2rem;margin-bottom:0.5rem;">Event
                                         Registration</h3>
@@ -3337,7 +3368,7 @@
                                 </div>
                                 <div style="padding:1.5rem;">
                                     <div class="card-icon"
-                                        style="width:44px;height:44px;font-size:1rem;margin:0 0 1rem 0;"><i
+                                        style="width:44px;height:44px;font-size:1rem;margin:0 auto 1rem auto;"><i
                                             class="fas fa-chart-bar"></i></div>
                                     <h3 style="color:var(--accent-orange);font-size:1.2rem;margin-bottom:0.5rem;">
                                         Post-Race Analytics</h3>
@@ -3375,41 +3406,26 @@
                                         <h3 style="margin:0; font-size:1.5rem;">Pro</h3>
                                     </div>
                                 </div>
-                                <ul class="list-unstyled" style="color:var(--text-secondary); line-height:1;">
-                                    <li
-                                        style="display:flex;justify-content:space-between;align-items:center;padding:0.85rem 0;border-bottom:1px solid var(--border);">
-                                        <span
-                                            style="color:var(--text-muted); font-size:0.85rem; text-transform:uppercase; letter-spacing:1px;">Max
-                                            Participants</span>
-                                        <strong style="color:var(--text-primary);">5,000</strong>
+                                <ul class="list-unstyled" style="margin:0;">
+                                    <li class="timing-feature-row">
+                                        <span class="tf-label">Max Participants</span>
+                                        <strong class="tf-value" style="color:var(--text-primary);">5,000</strong>
                                     </li>
-                                    <li
-                                        style="display:flex;justify-content:space-between;align-items:center;padding:0.85rem 0;border-bottom:1px solid var(--border);">
-                                        <span
-                                            style="color:var(--text-muted); font-size:0.85rem; text-transform:uppercase; letter-spacing:1px;">Split
-                                            Points</span>
-                                        <strong style="color:var(--text-primary);">Up to 4</strong>
+                                    <li class="timing-feature-row">
+                                        <span class="tf-label">Split Points</span>
+                                        <strong class="tf-value" style="color:var(--text-primary);">Up to 4</strong>
                                     </li>
-                                    <li
-                                        style="display:flex;justify-content:space-between;align-items:center;padding:0.85rem 0;border-bottom:1px solid var(--border);">
-                                        <span
-                                            style="color:var(--text-muted); font-size:0.85rem; text-transform:uppercase; letter-spacing:1px;">Live
-                                            SMS Alerts</span>
-                                        <i class="fas fa-check-circle" style="color:#28a745; font-size:1.2rem;"></i>
+                                    <li class="timing-feature-row">
+                                        <span class="tf-label">Live SMS Alerts</span>
+                                        <i class="fas fa-check-circle tf-value" style="color:#28a745; font-size:1.2rem;"></i>
                                     </li>
-                                    <li
-                                        style="display:flex;justify-content:space-between;align-items:center;padding:0.85rem 0;border-bottom:1px solid var(--border);">
-                                        <span
-                                            style="color:var(--text-muted); font-size:0.85rem; text-transform:uppercase; letter-spacing:1px;">Custom
-                                            Certificates</span>
-                                        <strong style="color:var(--text-primary);">Premium</strong>
+                                    <li class="timing-feature-row">
+                                        <span class="tf-label">Custom Certificates</span>
+                                        <strong class="tf-value" style="color:var(--text-primary);">Premium</strong>
                                     </li>
-                                    <li
-                                        style="display:flex;justify-content:space-between;align-items:center;padding:0.85rem 0;">
-                                        <span
-                                            style="color:var(--text-muted); font-size:0.85rem; text-transform:uppercase; letter-spacing:1px;">On-Site
-                                            Tech Support</span>
-                                        <strong style="color:var(--text-primary);">2 Technicians</strong>
+                                    <li class="timing-feature-row">
+                                        <span class="tf-label">On-Site Tech Support</span>
+                                        <strong class="tf-value" style="color:var(--text-primary);">2 Technicians</strong>
                                     </li>
                                 </ul>
                             </div>
@@ -3429,41 +3445,26 @@
                                         <h3 style="margin:0; font-size:1.5rem;">Enterprise</h3>
                                     </div>
                                 </div>
-                                <ul class="list-unstyled" style="color:var(--text-secondary); line-height:1;">
-                                    <li
-                                        style="display:flex;justify-content:space-between;align-items:center;padding:0.85rem 0;border-bottom:1px solid var(--border);">
-                                        <span
-                                            style="color:var(--text-muted); font-size:0.85rem; text-transform:uppercase; letter-spacing:1px;">Max
-                                            Participants</span>
-                                        <strong style="color:var(--accent-orange);">Unlimited</strong>
+                                <ul class="list-unstyled" style="margin:0;">
+                                    <li class="timing-feature-row">
+                                        <span class="tf-label">Max Participants</span>
+                                        <strong class="tf-value" style="color:var(--accent-orange);">Unlimited</strong>
                                     </li>
-                                    <li
-                                        style="display:flex;justify-content:space-between;align-items:center;padding:0.85rem 0;border-bottom:1px solid var(--border);">
-                                        <span
-                                            style="color:var(--text-muted); font-size:0.85rem; text-transform:uppercase; letter-spacing:1px;">Split
-                                            Points</span>
-                                        <strong style="color:var(--accent-orange);">Unlimited</strong>
+                                    <li class="timing-feature-row">
+                                        <span class="tf-label">Split Points</span>
+                                        <strong class="tf-value" style="color:var(--accent-orange);">Unlimited</strong>
                                     </li>
-                                    <li
-                                        style="display:flex;justify-content:space-between;align-items:center;padding:0.85rem 0;border-bottom:1px solid var(--border);">
-                                        <span
-                                            style="color:var(--text-muted); font-size:0.85rem; text-transform:uppercase; letter-spacing:1px;">Live
-                                            SMS Alerts</span>
-                                        <i class="fas fa-check-circle" style="color:#28a745; font-size:1.2rem;"></i>
+                                    <li class="timing-feature-row">
+                                        <span class="tf-label">Live SMS Alerts</span>
+                                        <i class="fas fa-check-circle tf-value" style="color:#28a745; font-size:1.2rem;"></i>
                                     </li>
-                                    <li
-                                        style="display:flex;justify-content:space-between;align-items:center;padding:0.85rem 0;border-bottom:1px solid var(--border);">
-                                        <span
-                                            style="color:var(--text-muted); font-size:0.85rem; text-transform:uppercase; letter-spacing:1px;">Custom
-                                            Certificates</span>
-                                        <strong style="color:var(--accent-orange);">Fully Branded</strong>
+                                    <li class="timing-feature-row">
+                                        <span class="tf-label">Custom Certificates</span>
+                                        <strong class="tf-value" style="color:var(--accent-orange);">Fully Branded</strong>
                                     </li>
-                                    <li
-                                        style="display:flex;justify-content:space-between;align-items:center;padding:0.85rem 0;">
-                                        <span
-                                            style="color:var(--text-muted); font-size:0.85rem; text-transform:uppercase; letter-spacing:1px;">On-Site
-                                            Tech Support</span>
-                                        <strong style="color:var(--accent-orange);">Full Team</strong>
+                                    <li class="timing-feature-row">
+                                        <span class="tf-label">On-Site Tech Support</span>
+                                        <strong class="tf-value" style="color:var(--accent-orange);">Full Team</strong>
                                     </li>
                                 </ul>
                             </div>
